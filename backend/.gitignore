@@ -1,0 +1,7 @@
+# Files
+.env
+package-lock.json
+
+# Folders
+/node_modules
+/ethereum

@@ -1,0 +1,40 @@
+{
+  "name": "plegbloc",
+  "version": "1.0.0",
+  "description": "IBC Project on \"Trustful Crowdfunding\".",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "mocha"
+  },
+  "keywords": [
+    "blockchain",
+    "crowdfunding"
+  ],
+  "author": "Shaney Waris, Abhinav Sharma, Aditya Singh Rathore",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "ejs": "^2.6.1",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.2",
+    "express-validator": "^6.13.0",
+    "fs": "*",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.11",
+    "node-fetch": "^3.0.0",
+    "nodemailer": "^6.7.0",
+    "path": "^0.12.7",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
