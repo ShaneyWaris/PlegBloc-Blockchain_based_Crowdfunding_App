@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, getName, getMobile, getFactory } from "../eth_scripts/core";
-import { setCookie } from "./../auth/helper";
+import axios from "axios";
 
 const LogIn = () => {
   const [data, setData] = useState({
@@ -28,23 +27,25 @@ const LogIn = () => {
     setLoading(true);
     setFormDisabled(true);
 
-    const flag = await loginUser(data.email, data.password);
-    if (flag == 69) {
-      const name = await getName(data.email, data.password);
-      const phone = await getMobile(data.email, data.password);
-      const factory = await getFactory(data.email, data.password);
-      const obj = {
-        name: name,
-        phone: phone,
-        email: data.email,
-        factory: factory,
-      };
-      setCookie(obj);
-      navigate("/allcontracts");
-      window.location.reload(true);
-    }
-    setFormDisabled(false);
-    setLoading(false);
+    axios
+      .post("http://localhost:8000/signin", data, { withCredentials: true })
+      .then((response) => {
+        if (response.data.isError) {
+          alert(response.data.message);
+        } else {
+          navigate("/allcontracts");
+          window.location.reload(true);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+        console.log(error);
+      })
+      .finally(() => {
+        setFormDisabled(false);
+        setLoading(false);
+        console.log("Done");
+      });
   };
 
   return (

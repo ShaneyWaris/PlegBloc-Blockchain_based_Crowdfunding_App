@@ -13,8 +13,8 @@ contract CampaignFactory{
      * @dev Create new campaigns by providing minimum contribution value
      * @param min_c Minimum contribution to be made to start a campaign
      */
-    function createCampaign(string memory email, string memory name, string memory description, uint min_c, uint target_amt) public{
-        address new_campaign = address(new Campaign(email, name, description, min_c, target_amt, msg.sender));
+    function createCampaign(uint min_c) public{
+        address new_campaign = address(new Campaign(min_c, msg.sender));
         deployed_campaigns.push(new_campaign);
     }
     
@@ -48,12 +48,7 @@ contract Campaign{
     }
     
     address public creator;
-    string public creator_email;
-    string public name;
-    string public c_description;
     uint public minimum_contribution;
-    uint public target_amount;
-    bool public isActive;
     mapping(address => bool) public backers;
     uint backers_count; 
     Request[] public requests;
@@ -70,14 +65,9 @@ contract Campaign{
      * @param min_c minimum contribution to start the campaign
      * @param manager the address of the campaign creator/manager
      */
-    constructor (string memory email, string memory _name, string memory _description, uint min_c, uint target_amt, address manager) {
+    constructor (uint min_c, address manager) {
         creator = manager;
-        creator_email = email;
-        name = _name;
-        c_description = _description;
         minimum_contribution = min_c;
-        target_amount = target_amt;
-        isActive = true;
         backers_count = 0;
         
     }

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getUserInfo, isAuthenticated } from "../auth/helper";
+import { useNavigate } from "react-router-dom";
+import { getCurrentUser, isAuthenticated } from "../auth/helper";
+import axios from "axios";
 import { createCampaign } from "../eth_scripts/core";
 
 const CreateContract = () => {
+  const navigate = useNavigate();
   const default_obj = {
     name: "",
     description: "",
@@ -33,35 +36,72 @@ const CreateContract = () => {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      const user = getUserInfo();
-      setUser(user);
+      const user_email = getCurrentUser();
+      const post_data = {
+        email: user_email,
+      };
+      axios
+        .post("http://localhost:8000/getUser", post_data, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data.isError) {
+            console.log(response.data.message);
+          } else {
+            const user = response.data.user;
+            setUser(user);
+          }
+        });
     }
   }, []);
 
-  const formSubmit = async (e) => {
+  const formSubmit = (e) => {
     e.preventDefault();
     setFormDisabled(true);
     setLoading(true);
     if (parseInt(data.target_amount) < parseInt(data.min_amount)) {
       alert("Target Amount should be greater than Minimum Amount");
     } else {
-      const campaign_address = await createCampaign(
-        user.email,
-        data.name,
-        data.description,
+      const campaignAddressCaller = createCampaign(
         data.min_amount,
-        data.target_amount,
-        user.factory
-      );
-      if (campaign_address == -1) {
-        alert("Campaign Creation Failed. :/");
-      } else {
-        alert("Campaign Created Successfully. :)");
-        setData(default_obj);
-      }
+        user.myCampaignFactoryAddress
+      ).then((address) => {
+        if (address !== -1) {
+          const campaign = {
+            manager: user.email,
+            campaignAddress: address,
+            contractFactoryAddress: user.myCampaignFactoryAddress,
+            name: data.name,
+            description: data.description,
+            minAmount: parseInt(data.min_amount),
+            targetAmount: parseInt(data.target_amount),
+          };
+
+          axios
+            .post("http://localhost:8000/createCampaign", campaign, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (response.data.isError) {
+                alert(response.data.message);
+              } else {
+                alert("Campaign Created Successfully.");
+                setData(default_obj);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+            .finally(() => {
+              setFormDisabled(false);
+              setLoading(false);
+            });
+        } else {
+          setFormDisabled(false);
+          setLoading(false);
+        }
+      });
     }
-    setFormDisabled(false);
-    setLoading(false);
   };
 
   return (

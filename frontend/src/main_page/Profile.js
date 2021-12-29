@@ -1,23 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteCookie, getUserInfo, isAuthenticated } from "../auth/helper";
+import { getCurrentUser, isAuthenticated } from "../auth/helper";
+import axios from "axios";
 
 const Profile = () => {
   const [data, setData] = useState({
     name: "",
-    phone: "",
+    username: "",
     email: "",
-    factory: "",
+    phone: "",
   });
 
   const [isFormDisabled, setFormDisabled] = useState(false);
+  const [isUpdateLoading, setUpdateLoading] = useState(false);
   const [isLogoutLoading, setLogoutLoading] = useState(false);
+  const [user, setUser] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated()) {
-      const user = getUserInfo();
-      setData(user);
+      const user_email = getCurrentUser();
+      const data = {
+        email: user_email,
+      };
+      axios
+        .post("http://localhost:8000/getUser", data, { withCredentials: true })
+        .then((response) => {
+          if (response.data.isError) {
+            console.log(response.data.message);
+          } else {
+            const user = response.data.user;
+            setUser(user);
+            const temp_data = {
+              name: user.name,
+              username: user.username,
+              phone: user.phone,
+              email: user.email,
+            };
+            setData(temp_data);
+          }
+        });
     }
   }, []);
 
@@ -38,13 +60,59 @@ const Profile = () => {
     if (btn === "logout") {
       setLogoutLoading(true);
       if (isAuthenticated()) {
-        deleteCookie();
-        alert("Logged Out Successfully");
-        navigate("/login");
-        window.location.reload(true);
-        setFormDisabled(false);
-        setLogoutLoading(false);
+        const post_data = {
+          email: data.email,
+        };
+
+        axios
+          .post("http://localhost:8000/logout", post_data, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data.isError) {
+              console.log("Some error occured");
+            } else {
+              alert("Logged Out Successfully");
+              navigate("/login");
+              window.location.reload(true);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            setFormDisabled(false);
+            setLogoutLoading(false);
+          });
       }
+    } else if (btn === "update") {
+      setUpdateLoading(true);
+      user.name = data.name;
+      user.email = data.email;
+      user.username = data.username;
+      user.phone = data.phone;
+
+      const post_data = {
+        email: data.email,
+        user: user,
+      };
+
+      axios
+        .post("http://localhost:8000/updateUser", post_data, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Error fetching data: ", error);
+        })
+        .finally(() => {
+          console.log("Update Done");
+          setFormDisabled(false);
+          setUpdateLoading(false);
+          window.location.reload(true);
+        });
     }
   };
   return (
@@ -68,7 +136,22 @@ const Profile = () => {
                   value={data.name}
                   onChange={InputEvent}
                   placeholder="Enter your name"
-                  disabled
+                  disabled={isFormDisabled}
+                />
+              </div>
+              <div className="mb-3">
+                <label for="exampleFormControlInput1" className="form-label">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="exampleFormControlInput1"
+                  name="username"
+                  value={data.username}
+                  onChange={InputEvent}
+                  placeholder="Username"
+                  disabled={isFormDisabled}
                 />
               </div>
               <div className="mb-3">
@@ -83,7 +166,7 @@ const Profile = () => {
                   value={data.phone}
                   onChange={InputEvent}
                   placeholder="Mobile No"
-                  disabled
+                  disabled={isFormDisabled}
                 />
               </div>
               <div className="mb-3">
@@ -104,27 +187,27 @@ const Profile = () => {
                   Please provide a valid Email Address.
                 </div>
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Campaign Factory
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleFormControlInput1"
-                  name="factory"
-                  value={data.factory}
-                  onChange={InputEvent}
-                  placeholder="Campaign Factory Address"
-                  disabled
-                />
-                <div className="invalid-feedback">
-                  Please provide a valid Email Address.
-                </div>
-              </div>
               <div className="col-12">
                 <button
                   className="btn btn-outline-primary"
+                  type="submit"
+                  id="update"
+                  disabled={isFormDisabled}
+                >
+                  <span
+                    class="spinner-grow spinner-grow-sm"
+                    role="status"
+                    style={isUpdateLoading ? {} : { display: "none" }}
+                    aria-hidden="true"
+                  ></span>
+                  {isUpdateLoading ? (
+                    <span>Updating...</span>
+                  ) : (
+                    <span>Update Information</span>
+                  )}
+                </button>
+                <button
+                  className="btn btn-outline-primary ms-3"
                   type="submit"
                   id="logout"
                   disabled={isFormDisabled}

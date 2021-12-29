@@ -19,14 +19,14 @@ const deployedAddressPath = path.resolve(__dirname, "../scripts/address.js");
 
 (async () => {
   const accounts = await web3.eth.getAccounts();
-  console.log(`Attempting to deploy from account: ${accounts[2]}`);
+  console.log(`Attempting to deploy from account: ${accounts[1]}`);
 
   const deployedFactory = await new web3.eth.Contract(compiledFactory.abi)
     .deploy({
       data: "0x" + compiledFactory.evm.bytecode.object,
     })
     .send({
-      from: accounts[2],
+      from: accounts[1],
       gas: "2000000",
     });
 

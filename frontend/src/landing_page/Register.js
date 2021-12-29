@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../eth_scripts/core";
-import { createCampaignFactory } from "../eth_scripts/core";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
     name: "",
+    username: "",
     phone: "",
     email: "",
     password: "",
@@ -26,40 +26,42 @@ const Register = () => {
     });
   };
 
-  const formSubmit = async (e) => {
+  const formSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setFormDisabled(true);
-
     if (data.password !== data.confirm_password) {
       alert("Password and Confirm Password must be same!");
       setFormDisabled(false);
       setLoading(false);
-      return;
-    }
-
-    const isRegistered = await registerUser(
-      data.email,
-      data.password,
-      data.name,
-      data.phone    
-      );
-    if (isRegistered == 69) {
-      alert("Account created successfully :)");
-      navigate("/login");
     } else {
-      alert("Account creation failed :(");
-      setFormDisabled(false);
-      setLoading(false);
+      const _data = {
+        name: data.name,
+        username: data.username,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      };
+
+      axios
+        .post("http://localhost:8000/signup", _data, { withCredentials: true })
+        .then((response) => {
+          if (response.data.isError) {
+            alert(response.data.message);
+          } else {
+            alert("Account Created Successfully. Redirecting to Login.");
+            navigate("/login");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data: ", error);
+        })
+        .finally(() => {
+          setFormDisabled(false);
+          setLoading(false);
+          console.log("Done");
+        });
     }
-
-    // const camp_factory = await createCampaignFactory();
-    // if (camp_factory !== "") {
-      
-    // }
-
-    setFormDisabled(false);
-    setLoading(false);
   };
 
   return (
@@ -83,6 +85,21 @@ const Register = () => {
                   value={data.name}
                   onChange={InputEvent}
                   placeholder="Enter your name"
+                  disabled={isFormDisabled}
+                />
+              </div>
+              <div className="mb-3">
+                <label for="exampleFormControlInput1" className="form-label">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="exampleFormControlInput1"
+                  name="username"
+                  value={data.username}
+                  onChange={InputEvent}
+                  placeholder="Username"
                   disabled={isFormDisabled}
                 />
               </div>

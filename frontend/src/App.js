@@ -24,7 +24,6 @@ import { isAuthenticated } from "./auth/helper";
 import PublicRoute from "./auth/PublicRoute";
 import PrivateRoute from "./auth/PrivateRoute";
 import CampaignDetail from "./main_page/CampaignDetail";
-import RequestsPage from "./main_page/RequestsPage";
 
 const App = () => {
   return (
@@ -129,15 +128,6 @@ const App = () => {
           element={
             <PrivateRoute>
               <CampaignDetail />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          end
-          path="/viewRequests"
-          element={
-            <PrivateRoute>
-              <RequestsPage />
             </PrivateRoute>
           }
         />
