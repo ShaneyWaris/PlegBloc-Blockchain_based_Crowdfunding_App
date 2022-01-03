@@ -55,6 +55,47 @@ async function comparePassword(password, hash) {
     }
 }
 
+
+// async function func() {
+    // console.log("\n")
+    // let hashPassword = await hash("Pass");
+    // console.log(hashPassword)
+    // console.log("\n")
+    // let cp = await comparePassword("Pass", hashPassword);
+    // // console.log(cp)
+
+    // console.log("\n")
+    // let frontend_hashPassword = await hash("Pass");
+    // console.log(frontend_hashPassword)
+
+    // console.log("\n")
+    // let db_hashPassword = await hash(frontend_hashPassword);
+    // console.log(db_hashPassword)
+
+    // console.log("\n")
+    // let cp = await comparePassword("Pass", db_hashPassword);
+    // console.log(cp)
+
+    
+    // console.log("\n")
+    // let frontend_hashPassword = await hash("Pass");
+    // console.log(frontend_hashPassword)
+
+    // console.log("\n")
+    // let cp = await comparePassword("Pass", frontend_hashPassword);
+    // console.log(cp)
+
+    // console.log("\n")
+    // let frontend_hashPassword1 = await hash("Pass");
+    // console.log(frontend_hashPassword1)
+
+    // console.log("\n")
+    // let cp1 = await comparePassword("Pass", frontend_hashPassword1);
+    // console.log(cp1)
+// }
+// func();
+
+
 // update user.
 function updateUserValues(mongoUser, newUser) {
     mongoUser.name = newUser.name;

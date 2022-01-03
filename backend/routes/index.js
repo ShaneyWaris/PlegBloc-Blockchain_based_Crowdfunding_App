@@ -15,4 +15,6 @@ router.post("/activeCampaigns", homeController.activeCampaigns);
 router.post("/myCampaigns", homeController.myCampaigns);
 router.post("/myContributedCampaigns", homeController.myContributedCampaigns);
 
+router.get("/verifyEmail", homeController.verifyEmail);
+
 module.exports = router;
