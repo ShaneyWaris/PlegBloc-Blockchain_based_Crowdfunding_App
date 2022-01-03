@@ -1,6 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
 
 
 // To show an error message on the UI.
@@ -53,6 +54,32 @@ async function comparePassword(password, hash) {
     } catch (e) {
         return false;
     }
+}
+
+
+async function sendEmail(name, email, phone, msg) {
+    var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "noreply.somag@gmail.com",
+            pass: "FCSsomag@102",
+        },
+    });
+    var mailOptions = {
+        from: "noreply.somag@gmail.com",
+        to: ["shaney18308@iiitd.ac.in", "abhinav18002@iiitd.ac.in"],
+        subject: "PlegBloc - Mail from Contact Us",
+        html: `<p>Hi PlegBloc developers!<br><br>A user with the following details wants to contant you.<br><br><b>Name:</b> ${name} <br><b>Email:</b> ${email}<br><b>Phone Number:</b> ${phone}<br><br><b>Message is -</b> <br>${msg} <br><br>Thanks for your time!`,
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+            return error;
+        } else {
+            console.log("Email sent: " + info.response);
+            return true;
+        }
+    });
 }
 
 
@@ -114,5 +141,6 @@ module.exports = {
     isLoggedIn,
     hash,
     comparePassword,
-    updateUserValues
+    updateUserValues,
+    sendEmail
 }
