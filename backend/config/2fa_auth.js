@@ -10,11 +10,9 @@ const generateSecret = () => {
 }
 
 
-const generateQRCode = (_secret) => {
-    qrcode.toDataURL(_secret.otpauth_url, (err, image_data) => {
-        if (err) throw err;
-        return image_data;
-    });
+const generateQRCode = async (_secret) => {
+    let image_data = await qrcode.toDataURL(_secret.otpauth_url);
+    return image_data;
 }
 
 
@@ -27,8 +25,11 @@ const isVerified = (_secret, _encoding, _otp) => {
     return verify;
 }
 
-// function main() {
-//     console.log(generateSecret());
+// async function main() {
+//     let s = generateSecret();
+//     console.log(s);
+//     let qr_code = await generateQRCode(s);
+//     console.log(qr_code);
 // }
 // main();
 
