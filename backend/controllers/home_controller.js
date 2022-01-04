@@ -1,5 +1,5 @@
 require("dotenv").config();
-const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues, sendEmail} = require("./functions");
+const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues, sendEmail, sendOTPEmail} = require("./functions");
 const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
@@ -18,9 +18,11 @@ module.exports.signup = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _name = req.body.name;
+  const _username = req.body.username;
   const _email = req.body.email;
   const _phone = req.body.phone;
   const _password = req.body.password;  // this should be the encrypted password.
+  const _myCampaignFactoryAddress = req.body.myCampaignFactoryAddress;
 
   User.findOne({ email: _email }, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding the user in DB");
@@ -29,13 +31,21 @@ module.exports.signup = async (req, res) => {
       const hashPassword = await hash(_password);
       let userObject = {
         name: _name,
+        username: _username,
         email: _email,
         password: hashPassword,
         phone: _phone,
+        myCampaignFactoryAddress: _myCampaignFactoryAddress
       };
-      User.create(userObject, (err, user) => {
+
+      User.create(userObject, async (err, user) => {
         if (err) return sendErrorMessage(res, 200, "Unable to create a user while signUp!");
         console.log("Sign Up successfully.");
+
+        // Now first send the mail to user for an OTP.
+        let otp = await genOtp(_email);
+        await sendOTPEmail(_name, _email, otp);
+
         return res.status(200).send({
           isError: false,
           user: user,
@@ -237,7 +247,10 @@ module.exports.verifyEmail = async (req, res) => {
       let isOtpCorrect = await verifyOtp(_otp, email);
       if (isOtpCorrect == true) {
         // redirect this user to authy page.
+        
       } else {
+        // send otp again.
+        return sendErrorMessage(res, 200, "Verification link has expired, we are sending an another OTP. Please verify on time. You have only 2 minutes.");
         // user has clicked the button very late.
         // again send the another otp, and say this in alert that an another otp has been transfered to their account.
       }

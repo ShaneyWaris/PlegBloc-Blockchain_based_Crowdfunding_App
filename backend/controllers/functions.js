@@ -71,7 +71,7 @@ async function sendEmail(name, email, phone, msg) {
         subject: "PlegBloc - Mail from Contact Us",
         html: `<p>Hi PlegBloc developers!<br><br>A user with the following details wants to contant you.<br><br><b>Name:</b> ${name} <br><b>Email:</b> ${email}<br><b>Phone Number:</b> ${phone}<br><br><b>Message is -</b> <br>${msg} <br><br>Thanks for your time!`,
     };
-    transporter.sendMail(mailOptions, function (error, info) {
+    await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
             return error;
@@ -81,6 +81,33 @@ async function sendEmail(name, email, phone, msg) {
         }
     });
 }
+
+
+async function sendOTPEmail(name, email, otp) {
+    var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "noreply.somag@gmail.com",
+            pass: "FCSsomag@102",
+        },
+    });
+    var mailOptions = {
+        from: "noreply.somag@gmail.com",
+        to: email,
+        subject: "Verify your Email ID with PlegBloc",
+        html: `<p>Hi ${name}!<br><br>Please verify your email ID by clicking on this link - <br><br><b>http://localhost:3000/verifyEmail/${email}/${otp}<br><br>Thanks for your time!`,
+    };
+    await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+            return error;
+        } else {
+            console.log("Email sent: " + info.response);
+            return true;
+        }
+    });
+}
+
 
 
 // async function func() {
@@ -142,5 +169,6 @@ module.exports = {
     hash,
     comparePassword,
     updateUserValues,
-    sendEmail
+    sendEmail,
+    sendOTPEmail
 }

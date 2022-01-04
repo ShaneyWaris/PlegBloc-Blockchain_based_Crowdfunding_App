@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    username: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
@@ -18,17 +22,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    myCampaignFactoryAddress: {
+        type: String,
+        required: true
+    },
+     // Not Required Fields.
     isVerified: {
         type: Boolean,
         default: false
     },
     authySecret: {
         type: Object,
-    },
-    // Not Required Fields.
-    myCampaignFactoryAddress: {
-        type: String,
-        default: "",
     },
     myCreatedCampaigns: [{
         type: Object

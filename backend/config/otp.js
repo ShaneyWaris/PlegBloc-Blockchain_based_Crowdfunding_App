@@ -71,13 +71,13 @@ const verifyOtp = async (otp, _email) => {
     }
 };
 
-// async function main() {
-//     let x = await genOtp("abc@gmail.com");
-//     console.log(x)
-//     let y = await verifyOtp(x, "abc@gmail.com");
-//     console.log(y)
-// }
-// main();
+async function main() {
+    let x = await genOtp("abc@gmail.com");
+    console.log(x)
+    let y = await verifyOtp(x, "abc@gmail.com");
+    console.log(y)
+}
+main();
 
 
 module.exports = {
