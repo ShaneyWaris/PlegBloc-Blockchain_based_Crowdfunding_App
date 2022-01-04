@@ -246,7 +246,7 @@ module.exports.verifyEmail = async (req, res) => {
     if (user) {
       if (user.isVerified == true) return sendErrorMessage(res, 200, "This user is already verified.");
 
-      let isOtpCorrect = await verifyOtp(_otp, email);
+      let isOtpCorrect = await verifyOtp(_otp, _email);
       if (isOtpCorrect == true) {
         const secret = generateSecret();
         const qrcode = await generateQRCode();
@@ -256,8 +256,8 @@ module.exports.verifyEmail = async (req, res) => {
         });
       } else {
         // send otp again.
-        let otp = await genOtp(_email);
-        await sendOTPEmail(user.name, _email, otp);
+        let newOtp = await genOtp(_email);
+        await sendOTPEmail(user.name, _email, newOtp);
 
         return sendErrorMessage(res, 200, "Verification link has expired, we are sending an another OTP. Please verify on time. You have only 2 minutes.");
         // user has clicked the button very late.
