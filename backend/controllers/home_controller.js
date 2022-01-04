@@ -373,3 +373,27 @@ module.exports.forgotPassword = (req, res) => {
     }
   });
 }
+
+
+module.exports.updatePassword = async (req, res) => {
+  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+
+  const _email = req.body.email;
+  const _newPassword = req.body.password;
+
+  // check if this user is already verified or not from the DB?
+  User.findOne({email:_email}, async (err, user) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+
+    if (user) {
+      const hashPassword = await hash(_newPassword);
+      user.password = hashPassword;
+      await user.save();
+      return res.status(200).send({
+        isError: false
+      });
+    } else {
+      return sendErrorMessage(res, 200, "This user do not exist.")
+    }
+  });  
+}

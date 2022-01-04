@@ -20,6 +20,7 @@ router.post("/contact-us", homeController.contactus);
 router.post("/verifyAuthyOtp", homeController.verifyAuthyOtp);
 
 router.post("/forgotPassword", homeController.forgotPassword);
+router.post("/updatePassword", homeController.updatePassword);
 
 
 module.exports = router;
