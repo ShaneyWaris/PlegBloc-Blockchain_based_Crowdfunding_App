@@ -30,7 +30,7 @@ const isVerified = (_secret, _encoding, _otp) => {
     // console.log(s);
     // let qr_code = await generateQRCode(s);
     // console.log(qr_code);
-}
+// }
 // main();
 
 module.exports = {
