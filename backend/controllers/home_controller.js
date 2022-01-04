@@ -7,11 +7,13 @@ const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_au
 const {genOtp, verifyOtp} = require('./../config/otp');
 
 
+// This is the home page for backend.
 module.exports.home = (req, res) => {
   return sendErrorMessage(res, 200, "Home Page!");
 };
 
 
+// Sign Up controller.
 module.exports.signup = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
@@ -56,6 +58,7 @@ module.exports.signup = async (req, res) => {
 };
 
 
+// Sign In controller.
 module.exports.signin = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
@@ -103,6 +106,7 @@ module.exports.signin = async (req, res) => {
 };
 
 
+// Create campaign controller.
 module.exports.createCampaign = async (req, res) => {
   // User needs to be authenticated to create a campaign.
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
@@ -153,6 +157,7 @@ module.exports.createCampaign = async (req, res) => {
 };
 
 
+// get User object from the given email ID.
 module.exports.getUser = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
@@ -169,6 +174,7 @@ module.exports.getUser = (req, res) => {
 };
 
 
+// update user profile details.
 module.exports.updateUser = async (req, res) => {
   const _email = req.body.email;
   const _user = req.body.user;
@@ -187,6 +193,7 @@ module.exports.updateUser = async (req, res) => {
 };
 
 
+// Logout from the account.
 module.exports.logout = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You are already logged out.");
 
@@ -199,11 +206,14 @@ module.exports.logout = (req, res) => {
 };
 
 
+// send a list of all active campaigns.
 module.exports.activeCampaigns = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
   Campaign.find({}, (err, allActiveCampaigns) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding all campaigns from the DB.");
+
+    // TODO: send only those campaigns whose isActive = true.
 
     return res.status(200).send({
       isError: false,
@@ -213,6 +223,7 @@ module.exports.activeCampaigns = (req, res) => {
 };
 
 
+// get all the campaigns created by a user.
 module.exports.myCampaigns = (req, res) =>{
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
@@ -229,6 +240,7 @@ module.exports.myCampaigns = (req, res) =>{
 } 
 
 
+// get all the campaigns where user has contributed some amount.
 module.exports.myContributedCampaigns = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
@@ -249,12 +261,10 @@ module.exports.myContributedCampaigns = (req, res) => {
 }
 
 
-
+// verify the email ID of a user.
 module.exports.verifyEmail = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
-  // const _email = req.query.email;
-  // const _otp = req.query.otp;
   const _email = req.body.email;
   const _otp = req.body.otp;
 
@@ -271,7 +281,6 @@ module.exports.verifyEmail = async (req, res) => {
         const secret = generateSecret();
         const qrcode = await generateQRCode(secret);
 
-        // mark user.isVerified = true
         user.isVerified = true;
         user.secret = secret;
         await user.save();
@@ -281,21 +290,21 @@ module.exports.verifyEmail = async (req, res) => {
           qr_code: qrcode
         });
       } else {
-        // send otp again.
+        // send an otp again.
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
-
-        return sendErrorMessage(res, 200, "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID.");
-        // user has clicked the button very late.
+        // user has clicked the link after 2 minutes.
         // again send the another otp, and say this in alert that an another otp has been transfered to their account.
+        return sendErrorMessage(res, 200, "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID.");
       }
     } else {
         return sendErrorMessage(res, 200, "This user do not exist.");
     }
-  })
-  
+  })  
 }
 
+
+// Contact Us.
 module.exports.contactus = async (req, res) => {
   const name = req.body.name;
   const phone = req.body.phone;
@@ -316,13 +325,13 @@ module.exports.contactus = async (req, res) => {
 }
 
 
+// verify authy OTP.
 module.exports.verifyAuthyOtp = (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _otp = req.body.otp;
 
-  // check if this user is already verified or not from the DB?
   User.findOne({email:_email}, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
 
@@ -346,7 +355,7 @@ module.exports.verifyAuthyOtp = (req, res) => {
 }
 
 
-
+// Forgot Password.
 module.exports.forgotPassword = (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
@@ -375,13 +384,13 @@ module.exports.forgotPassword = (req, res) => {
 }
 
 
+// Update Password of a user.
 module.exports.updatePassword = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _newPassword = req.body.password;
 
-  // check if this user is already verified or not from the DB?
   User.findOne({email:_email}, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
 

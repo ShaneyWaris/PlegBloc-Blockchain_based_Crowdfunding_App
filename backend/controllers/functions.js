@@ -61,13 +61,13 @@ async function sendEmail(name, email, phone, msg) {
     var transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-            user: "noreply.somag@gmail.com",
-            pass: "FCSsomag@102",
+            user: process.env.mailID,
+            pass: process.env.mailPassword,
         },
     });
     var mailOptions = {
-        from: "noreply.somag@gmail.com",
-        to: ["shaney18308@iiitd.ac.in", "abhinav18002@iiitd.ac.in"],
+        from: process.env.mailID,
+        to: [process.env.shaneyEmail, process.env.abhinavEmail, process.env.adityaEmail, process.env.mailID],
         subject: "PlegBloc - Mail from Contact Us",
         html: `<p>Hi PlegBloc developers!<br><br>A user with the following details wants to contant you.<br><br><b>Name:</b> ${name} <br><b>Email:</b> ${email}<br><b>Phone Number:</b> ${phone}<br><br><b>Message is -</b> <br>${msg} <br><br>Thanks for your time!`,
     };
@@ -87,15 +87,15 @@ async function sendOTPEmail(name, email, otp) {
     var transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-            user: "noreply.somag@gmail.com",
-            pass: "FCSsomag@102",
+            user: process.env.mailID,
+            pass: process.env.mailPassword,
         },
     });
     var mailOptions = {
-        from: "noreply.somag@gmail.com",
+        from: process.env.mailID,
         to: email,
         subject: "Verify your Email ID with PlegBloc",
-        html: `<p>Hi ${name}!<br><br>Please verify your email ID by clicking on below link. You have only 2 minutes to verify your email ID. After 2 minutes, this link will be expired.<br><br><b>http://localhost:3000/verifyEmail/${email}/${otp}</b><br><br>Thanks!<br><br>Team - PlegBloc`,
+        html: `<p>Hi ${name}!<br><br>Thanks for choosinng PlegBloc.<br>Please verify your email ID by clicking on below link. You have only 2 minutes to verify your email ID. After 2 minutes, this link will be expired.<br><br><b>${process.env.frontendBaseURL}/verifyEmail/${email}/${otp}</b><br><br>Thanks<br>Team - PlegBloc`,
     };
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
