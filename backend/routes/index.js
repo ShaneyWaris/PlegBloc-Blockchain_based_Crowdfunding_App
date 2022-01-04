@@ -17,5 +17,7 @@ router.post("/myContributedCampaigns", homeController.myContributedCampaigns);
 
 router.post("/verifyEmail", homeController.verifyEmail);
 router.post("/contact-us", homeController.contactus);
+router.post("/verifyAuthyOtp", homeController.verifyAuthyOtp);
+
 
 module.exports = router;

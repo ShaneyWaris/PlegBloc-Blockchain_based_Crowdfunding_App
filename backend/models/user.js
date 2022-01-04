@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema({
         required: true
     },
      // Not Required Fields.
+    secret: {
+        type: Object
+    },
     isVerified: {
         type: Boolean,
         default: false

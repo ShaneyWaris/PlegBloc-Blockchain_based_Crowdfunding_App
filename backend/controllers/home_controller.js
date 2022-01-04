@@ -72,6 +72,16 @@ module.exports.signin = async (req, res) => {
       if (isSame == false) {
         return sendErrorMessage(res, 200, "User has entered a wrong password.");
       }
+
+      // check if user is verified or not.  
+      if (user.isVerified == true) {
+        // send otp again.
+        let newOtp = await genOtp(_email);
+        await sendOTPEmail(user.name, _email, newOtp);
+
+        return sendErrorMessage(res, 200, "You need to verify your email ID first.");
+      }
+
       // Generate access token.
       const accessToken = generateToken(_email);
       // set this access token into cookies.
@@ -248,8 +258,15 @@ module.exports.verifyEmail = async (req, res) => {
 
       let isOtpCorrect = await verifyOtp(_otp, _email);
       if (isOtpCorrect == true) {
+        // generate qr-code and send it to my user.
         const secret = generateSecret();
         const qrcode = await generateQRCode(secret);
+
+        // mark user.isVerified = true
+        user.isVerified = true;
+        user.secret = secret;
+        await user.save();
+
         res.status(200).send({
           isError: false,
           qr_code: qrcode
@@ -293,4 +310,30 @@ module.exports.contactus = async (req, res) => {
       message: isEmailSent
     });
   }
+}
+
+
+module.exports.verifyAuthyOtp = (req, res) => {
+  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+
+  const _email = req.body.email;
+  const _otp = req.body.otp;
+
+  // check if this user is already verified or not from the DB?
+  User.findOne({email:_email}, async (err, user) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+
+    if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
+
+    let secret = user.secret;
+    let isAuthyCorrect = isVerified(secret, "ascii", _otp);
+
+    if (isAuthyCorrect == true) {
+      return res.status(200).send({
+        isError: false
+      });
+    } else {
+      return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+    }
+  })
 }
