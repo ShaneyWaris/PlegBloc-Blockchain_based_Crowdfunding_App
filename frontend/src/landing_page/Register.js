@@ -13,6 +13,8 @@ const Register = () => {
     confirm_password: "",
   });
 
+  const [passFlag, setPassFlag] = useState(0);
+
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
@@ -24,9 +26,12 @@ const Register = () => {
         [name]: value,
       };
     });
+    if (name === "password") {
+      setPassFlag(1);
+    }
   };
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setFormDisabled(true);
@@ -86,12 +91,16 @@ const Register = () => {
                   onChange={InputEvent}
                   placeholder="Enter your name"
                   disabled={isFormDisabled}
+                  required
                 />
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Username
-                </label>
+              <label for="exampleFormControlInput1" className="form-label">
+                Username
+              </label>
+              <div className="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                  @
+                </span>
                 <input
                   type="text"
                   className="form-control"
@@ -101,12 +110,16 @@ const Register = () => {
                   onChange={InputEvent}
                   placeholder="Username"
                   disabled={isFormDisabled}
+                  required
                 />
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Phone
-                </label>
+              <label for="exampleFormControlInput1" className="form-label">
+                Phone
+              </label>
+              <div className="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                  +91
+                </span>
                 <input
                   type="text"
                   className="form-control"
@@ -116,6 +129,7 @@ const Register = () => {
                   onChange={InputEvent}
                   placeholder="Mobile No"
                   disabled={isFormDisabled}
+                  required
                 />
               </div>
               <div className="mb-3">
@@ -131,6 +145,7 @@ const Register = () => {
                   onChange={InputEvent}
                   placeholder="name@example.com"
                   disabled={isFormDisabled}
+                  required
                 />
                 <div className="invalid-feedback">
                   Please provide a valid Email Address.
@@ -149,7 +164,13 @@ const Register = () => {
                   value={data.password}
                   onChange={InputEvent}
                   disabled={isFormDisabled}
+                  required
                 />
+                <div id="passwordHelpBlock" class="form-text">
+                  Your password must be 8-20 characters long, contain letters
+                  and numbers, and must not contain spaces, special characters,
+                  or emoji.
+                </div>
               </div>
               <div className="mb-3">
                 <label for="exampleInputPassword1" className="form-label">
@@ -164,11 +185,30 @@ const Register = () => {
                   value={data.confirm_password}
                   onChange={InputEvent}
                   disabled={isFormDisabled}
+                  required
                 />
+                {passFlag === 1 && data.confirm_password === data.password && (
+                  <div
+                    id="passwordHelpBlock2"
+                    class="form-text"
+                    style={{ color: "green" }}
+                  >
+                    &#10003; Password and Confirm Password match.
+                  </div>
+                )}
+                {passFlag === 1 && data.confirm_password !== data.password && (
+                  <div
+                    id="passwordHelpBlock2"
+                    class="form-text"
+                    style={{ color: "red" }}
+                  >
+                    &#x2718; Password and Confirm Password do not match.
+                  </div>
+                )}
               </div>
               <div className="col-12">
                 <button
-                  className="btn btn-outline-primary"
+                  className="btn btn-outline-primary mb-5"
                   type="submit"
                   disabled={isFormDisabled}
                 >
