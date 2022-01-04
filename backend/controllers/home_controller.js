@@ -63,6 +63,7 @@ module.exports.signin = async (req, res) => {
 
   const _email = req.body.email;
   const _password = req.body.password; // this should be the encrypted password.
+  const _otp = req.body.otp;
 
   User.findOne({ email: _email }, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding this user from DB");
@@ -73,24 +74,30 @@ module.exports.signin = async (req, res) => {
         return sendErrorMessage(res, 200, "User has entered a wrong password.");
       }
 
-      // check if user is verified or not.  
+      // check if user is verified or not.
       if (user.isVerified == false) {
         // send otp again.
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
-
         return sendErrorMessage(res, 200, "You need to verify your email ID first.");
       }
 
-      // Generate access token.
-      const accessToken = generateToken(_email);
-      // set this access token into cookies.
-      res.cookie("token", accessToken);
-      console.log("Sign In successfully.");
-      return res.status(200).json({
-        isError: false,
-        user: user,
-      });
+      let secret = user.secret;
+      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
+
+      if (isAuthyCorrect == true) {
+        // Generate access token.
+        const accessToken = generateToken(_email);
+        // set this access token into cookies.
+        res.cookie("token", accessToken);
+        console.log("Sign In successfully.");
+        return res.status(200).json({
+          isError: false,
+          user: user,
+        });
+      } else {
+        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+      }
     } else {
       return sendErrorMessage(res, 200, "This user do not exist!");
     }
