@@ -1,6 +1,13 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Contact = () => {
+  const def_obj = {
+    name: "",
+    phone: "",
+    email: "",
+    msg: "",
+  };
   const [data, setData] = useState({
     name: "",
     phone: "",
@@ -17,12 +24,32 @@ const Contact = () => {
       };
     });
   };
+  const [isFormDisabled, setFormDisabled] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `My name is ${data.name}. My mobile number is ${data.phone} and email is ${data.email}, Here is what I watn to say ${data.msg}`
-    );
+    setLoading(true);
+    setFormDisabled(true);
+    axios
+      .post("http://localhost:8000/contact-us", data, { withCredentials: true })
+      .then((response) => {
+        if (response.data.isError) {
+          alert(response.data.message);
+        } else {
+          alert("Message Sent Successfully");
+          setData(def_obj);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+        alert("Some unexpected error occured. Try again later.");
+      })
+      .finally(() => {
+        setFormDisabled(false);
+        setLoading(false);
+        console.log("Done");
+      });
   };
 
   return (
@@ -46,20 +73,27 @@ const Contact = () => {
                   value={data.name}
                   onChange={InputEvent}
                   placeholder="Enter your name"
+                  disabled={isFormDisabled}
+                  required
                 />
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Phone
-                </label>
+              <label for="exampleFormControlInput1" className="form-label">
+                Phone
+              </label>
+              <div className="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                  +91
+                </span>
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="exampleFormControlInput1"
                   name="phone"
                   value={data.phone}
                   onChange={InputEvent}
                   placeholder="Mobile number"
+                  disabled={isFormDisabled}
+                  required
                 />
               </div>
               <div className="mb-3">
@@ -74,6 +108,7 @@ const Contact = () => {
                   value={data.email}
                   onChange={InputEvent}
                   placeholder="name@example.com"
+                  required
                 />
                 <div className="invalid-feedback">
                   Please provide a valid Email Address.
@@ -90,11 +125,23 @@ const Contact = () => {
                   name="msg"
                   value={data.msg}
                   onChange={InputEvent}
+                  disabled={isFormDisabled}
+                  required
                 ></textarea>
               </div>
               <div className="col-12">
-                <button className="btn btn-outline-primary" type="submit">
-                  Submit form
+                <button
+                  className="btn btn-outline-primary"
+                  type="submit"
+                  disabled={isFormDisabled}
+                >
+                  <span
+                    class="spinner-grow spinner-grow-sm"
+                    role="status"
+                    style={isLoading ? {} : { display: "none" }}
+                    aria-hidden="true"
+                  ></span>
+                  {isLoading ? <span>Submitting...</span> : <span>Submit</span>}
                 </button>
               </div>
             </form>

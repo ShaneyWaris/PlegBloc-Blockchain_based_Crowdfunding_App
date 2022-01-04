@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import hidden_eye from "../images/hidden.png";
+import view_eye from "../images/view.png";
 
 const LogIn = () => {
   const [data, setData] = useState({
     email: "",
     password: "",
   });
+
+  const [showPass, setShowPass] = useState(false);
 
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -76,20 +80,32 @@ const LogIn = () => {
                   Please provide a valid Email Address.
                 </div>
               </div>
-              <div className="mb-3">
-                <label for="exampleInputPassword1" className="form-label">
-                  Password
-                </label>
+              <label for="exampleInputPassword1" className="form-label">
+                Password
+              </label>
+              <div className="input-group mb-3">
                 <input
-                  type="password"
+                  type={showPass ? "text" : "password"}
                   className="form-control"
                   id="exampleInputPassword1"
                   name="password"
                   value={data.password}
                   onChange={InputEvent}
+                  placeholder="Password"
                   disabled={isFormDisabled}
                   required
                 />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="button-addon2"
+                  onClick={() => setShowPass(!showPass)}
+                >
+                  <img
+                    style={{ height: "20px", width: "auto" }}
+                    src={showPass ? hidden_eye : view_eye}
+                  />
+                </button>
               </div>
               <div className="col-12">
                 <button
