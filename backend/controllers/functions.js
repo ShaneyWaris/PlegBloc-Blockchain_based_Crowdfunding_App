@@ -95,7 +95,7 @@ async function sendOTPEmail(name, email, otp) {
         from: "noreply.somag@gmail.com",
         to: email,
         subject: "Verify your Email ID with PlegBloc",
-        html: `<p>Hi ${name}!<br><br>Please verify your email ID by clicking on this link - <br><br><b>http://localhost:3000/verifyEmail/${email}/${otp}<br><br>Thanks for your time!`,
+        html: `<p>Hi ${name}!<br><br>Please verify your email ID by clicking on this link - <br><br><b>http://localhost:3000/verifyEmail/${email}/${otp}</b><br>Thanks for your time!`,
     };
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

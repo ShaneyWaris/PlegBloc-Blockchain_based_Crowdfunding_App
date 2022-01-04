@@ -249,7 +249,7 @@ module.exports.verifyEmail = async (req, res) => {
       let isOtpCorrect = await verifyOtp(_otp, _email);
       if (isOtpCorrect == true) {
         const secret = generateSecret();
-        const qrcode = await generateQRCode();
+        const qrcode = await generateQRCode(secret);
         res.status(200).send({
           isError: false,
           qr_code: qrcode
