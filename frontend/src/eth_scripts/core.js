@@ -37,7 +37,7 @@ const createCampaignFactory = async () => {
 
   let factory;
   let accounts;
-  let address;
+  let address = "";
   const create_factory = async () => {
     accounts = await web3.eth.getAccounts();
     factory = await new web3.eth.Contract(compiledFactory.abi)

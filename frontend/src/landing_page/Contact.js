@@ -34,12 +34,8 @@ const Contact = () => {
     axios
       .post("http://localhost:8000/contact-us", data, { withCredentials: true })
       .then((response) => {
-        if (response.data.isError) {
-          alert(response.data.message);
-        } else {
-          alert("Message Sent Successfully");
-          setData(def_obj);
-        }
+        alert("Message Sent Successfully");
+        setData(def_obj);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);

@@ -9,6 +9,7 @@ const Profile = () => {
     username: "",
     email: "",
     phone: "",
+    factory_address: "",
   });
 
   const [isFormDisabled, setFormDisabled] = useState(false);
@@ -36,6 +37,7 @@ const Profile = () => {
               username: user.username,
               phone: user.phone,
               email: user.email,
+              factory_address: user.myCampaignFactoryAddress,
             };
             setData(temp_data);
           }
@@ -91,6 +93,7 @@ const Profile = () => {
       user.email = data.email;
       user.username = data.username;
       user.phone = data.phone;
+      user.myCampaignFactoryAddress = data.factory_address;
 
       const post_data = {
         email: data.email,
@@ -181,6 +184,24 @@ const Profile = () => {
                   value={data.email}
                   onChange={InputEvent}
                   placeholder="name@example.com"
+                  disabled
+                />
+                <div className="invalid-feedback">
+                  Please provide a valid Email Address.
+                </div>
+              </div>
+              <div className="mb-3">
+                <label for="exampleFormControlInput1" className="form-label">
+                  Campaign Factory Address
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="exampleFormControlInput1"
+                  name="factory_address"
+                  value={data.factory_address}
+                  onChange={InputEvent}
+                  placeholder=""
                   disabled
                 />
                 <div className="invalid-feedback">

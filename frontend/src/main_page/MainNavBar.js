@@ -75,6 +75,16 @@ const MainNavBar = () => {
                         className={({ isActive }) =>
                           "nav-link" + (isActive ? " menu_active" : "")
                         }
+                        to="/vendorRegistration"
+                      >
+                        Register Vendor
+                      </NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink
+                        className={({ isActive }) =>
+                          "nav-link" + (isActive ? " menu_active" : "")
+                        }
                         to="/profile"
                       >
                         Profile

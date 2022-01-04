@@ -9,6 +9,8 @@ import About from "./landing_page/About";
 import Contact from "./landing_page/Contact";
 import LogIn from "./landing_page/LogIn";
 import Register from "./landing_page/Register";
+import ForgotPasswordAuth from "./landing_page/ForgotPasswordAuth";
+import UpdatePassword from "./landing_page/UpdatePassword";
 import Navbar from "./landing_page/Navbar";
 
 import AllContracts from "./main_page/AllContracts";
@@ -24,6 +26,8 @@ import { isAuthenticated } from "./auth/helper";
 import PublicRoute from "./auth/PublicRoute";
 import PrivateRoute from "./auth/PrivateRoute";
 import CampaignDetail from "./main_page/CampaignDetail";
+import VerifyEmail from "./landing_page/VerifyEmail";
+import VendorRegistration from "./main_page/VendorRegistration";
 
 const App = () => {
   return (
@@ -79,6 +83,36 @@ const App = () => {
 
         <Route
           end
+          path="/verifyEmail/:email/:otp"
+          element={
+            <PublicRoute>
+              <VerifyEmail />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/forgotPassAuth"
+          element={
+            <PublicRoute>
+              <ForgotPasswordAuth />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/updatePassword"
+          element={
+            <PublicRoute>
+              <UpdatePassword />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          end
           path="/allcontracts"
           element={
             <PrivateRoute>
@@ -110,6 +144,15 @@ const App = () => {
           element={
             <PrivateRoute>
               <CreateContract />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          end
+          path="/vendorRegistration"
+          element={
+            <PrivateRoute>
+              <VendorRegistration />
             </PrivateRoute>
           }
         />

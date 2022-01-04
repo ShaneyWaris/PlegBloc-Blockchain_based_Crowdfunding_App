@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createCampaignFactory } from "../eth_scripts/core";
 import axios from "axios";
 
 const Register = () => {
@@ -40,33 +41,38 @@ const Register = () => {
       setFormDisabled(false);
       setLoading(false);
     } else {
-      const _data = {
-        name: data.name,
-        username: data.username,
-        email: data.email,
-        phone: data.phone,
-        password: data.password,
-      };
+      const campaignFactoryAddress = await createCampaignFactory();
+      if (campaignFactoryAddress !== "") {
+        const _data = {
+          name: data.name,
+          username: data.username,
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+          myCampaignFactoryAddress: campaignFactoryAddress,
+        };
 
-      axios
-        .post("http://localhost:8000/signup", _data, { withCredentials: true })
-        .then((response) => {
-          if (response.data.isError) {
-            alert(response.data.message);
-          } else {
-            alert("Account Created Successfully. Redirecting to Login.");
-            navigate("/login");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching data: ", error);
-        })
-        .finally(() => {
-          setFormDisabled(false);
-          setLoading(false);
-          console.log("Done");
-        });
+        axios
+          .post("http://localhost:8000/signup", _data, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data.isError) {
+              alert(response.data.message);
+            } else {
+              alert(
+                "Account Created Successfully. Verification Mail Sent to Registered Email Id. :)"
+              );
+              navigate("/login");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching data: ", error);
+          });
+      }
     }
+    setLoading(false);
+    setFormDisabled(false);
   };
 
   return (

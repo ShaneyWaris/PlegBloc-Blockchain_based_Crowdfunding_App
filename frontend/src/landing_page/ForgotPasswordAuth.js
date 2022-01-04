@@ -1,17 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import hidden_eye from "../images/hidden.png";
 import view_eye from "../images/view.png";
 
-const LogIn = () => {
+function ForgotPasswordAuth() {
   const [data, setData] = useState({
     email: "",
-    password: "",
     otp: "",
   });
-
-  const [showPass, setShowPass] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
 
   const [isFormDisabled, setFormDisabled] = useState(false);
@@ -28,23 +25,24 @@ const LogIn = () => {
     });
   };
 
-  const onForgotPassClick = (e) => {
-    e.preventDefault();
-    navigate("/forgotPassAuth");
-  };
-
   const formSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setFormDisabled(true);
 
     axios
-      .post("http://localhost:8000/signin", data, { withCredentials: true })
+      .post("http://localhost:8000/forgotPassword", data, {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.isError) {
           alert(response.data.message);
         } else {
-          navigate("/allcontracts");
+          navigate("/updatePassword", {
+            state: {
+              email: data.email,
+            },
+          });
           window.location.reload(true);
         }
       })
@@ -59,11 +57,10 @@ const LogIn = () => {
         console.log("Done");
       });
   };
-
   return (
     <>
       <div className="my-5">
-        <h1 className="text-center">Log In</h1>
+        <h1 className="text-center">Forgot Password</h1>
       </div>
       <div className="container contact_div">
         <div className="row">
@@ -89,33 +86,6 @@ const LogIn = () => {
                 </div>
               </div>
               <label for="exampleInputPassword1" className="form-label">
-                Password
-              </label>
-              <div className="input-group mb-3">
-                <input
-                  type={showPass ? "text" : "password"}
-                  className="form-control"
-                  id="exampleInputPassword1"
-                  name="password"
-                  value={data.password}
-                  onChange={InputEvent}
-                  placeholder="Password"
-                  disabled={isFormDisabled}
-                  required
-                />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="button-addon2"
-                  onClick={() => setShowPass(!showPass)}
-                >
-                  <img
-                    style={{ height: "20px", width: "auto" }}
-                    src={showPass ? hidden_eye : view_eye}
-                  />
-                </button>
-              </div>
-              <label for="exampleInputPassword1" className="form-label">
                 Two Factor Authentication OTP
               </label>
               <div className="input-group mb-3">
@@ -126,7 +96,7 @@ const LogIn = () => {
                   name="otp"
                   value={data.otp}
                   onChange={InputEvent}
-                  placeholder="Two Factor Authentication OTP"
+                  placeholder="OTP"
                   disabled={isFormDisabled}
                   required
                 />
@@ -154,16 +124,11 @@ const LogIn = () => {
                     style={isLoading ? {} : { display: "none" }}
                     aria-hidden="true"
                   ></span>
-                  {isLoading ? <span>Logging In...</span> : <span>Log In</span>}
-                </button>
-                <button
-                  className="btn btn-outline-primary ms-3"
-                  type="button"
-                  name="forgot_pass"
-                  disabled={isFormDisabled}
-                  onClick={onForgotPassClick}
-                >
-                  Forgot Password?
+                  {isLoading ? (
+                    <span>Processing...</span>
+                  ) : (
+                    <span>Continue</span>
+                  )}
                 </button>
               </div>
             </form>
@@ -172,6 +137,6 @@ const LogIn = () => {
       </div>
     </>
   );
-};
+}
 
-export default LogIn;
+export default ForgotPasswordAuth;

@@ -9,10 +9,6 @@ const AllContracts = () => {
   const [campaigns, setCampaigns] = useState([]);
 
   useEffect(() => {
-    injectMetaMask();
-  }, []);
-
-  useEffect(() => {
     if (isAuthenticated()) {
       const user_email = getCurrentUser();
       const data = {
@@ -79,7 +75,6 @@ const AllContracts = () => {
     }
   }, []);
 
-  useEffect(() => {}, []);
   return (
     <>
       <Common title="Active Campaigns" data={campaigns} />
