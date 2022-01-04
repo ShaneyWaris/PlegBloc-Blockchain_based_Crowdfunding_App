@@ -234,8 +234,10 @@ module.exports.myContributedCampaigns = (req, res) => {
 module.exports.verifyEmail = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
-  const _email = req.query.email;
-  const _otp = req.query.otp;
+  // const _email = req.query.email;
+  // const _otp = req.query.otp;
+  const _email = req.body.email;
+  const _otp = req.body.otp;
 
   // check if this user is already verified or not from the DB?
   User.findOne({email:_email}, async (err, user) => {
@@ -246,10 +248,17 @@ module.exports.verifyEmail = async (req, res) => {
 
       let isOtpCorrect = await verifyOtp(_otp, email);
       if (isOtpCorrect == true) {
-        // redirect this user to authy page.
-        
+        const secret = generateSecret();
+        const qrcode = await generateQRCode();
+        res.status(200).send({
+          isError: false,
+          qr_code: qrcode
+        });
       } else {
         // send otp again.
+        let otp = await genOtp(_email);
+        await sendOTPEmail(user.name, _email, otp);
+
         return sendErrorMessage(res, 200, "Verification link has expired, we are sending an another OTP. Please verify on time. You have only 2 minutes.");
         // user has clicked the button very late.
         // again send the another otp, and say this in alert that an another otp has been transfered to their account.
