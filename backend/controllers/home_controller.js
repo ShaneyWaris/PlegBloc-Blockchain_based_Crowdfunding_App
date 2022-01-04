@@ -74,7 +74,7 @@ module.exports.signin = async (req, res) => {
       }
 
       // check if user is verified or not.  
-      if (user.isVerified == true) {
+      if (user.isVerified == false) {
         // send otp again.
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
