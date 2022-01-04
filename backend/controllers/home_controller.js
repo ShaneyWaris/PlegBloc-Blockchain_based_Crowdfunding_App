@@ -1,5 +1,5 @@
 require("dotenv").config();
-const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues} = require("./functions");
+const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues, sendEmail} = require("./functions");
 const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
@@ -250,5 +250,25 @@ module.exports.verifyEmail = async (req, res) => {
 
 
 module.exports.verifyAuthyOtp = (req, res) => {
-  
+
+}
+
+
+module.exports.contactus = async (req, res) => {
+  const name = req.body.name;
+  const phone = req.body.phone;
+  const email = req.body.email;
+  const msg = req.body.msg;
+
+  let isEmailSent = await sendEmail(name, email, phone, msg);
+  if (isEmailSent == true) {
+    return res.status(200).send({
+      isError: false,
+    });
+  } else {
+    return res.status(200).send({
+      isError: true,
+      message: isEmailSent
+    });
+  }
 }
