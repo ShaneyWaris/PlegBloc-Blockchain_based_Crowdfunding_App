@@ -237,10 +237,14 @@ module.exports.myContributedCampaigns = (req, res) => {
   User.findOne({email: _email}, (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
-    return res.status(200).send({
-      isError: false,
-      myContributedCampaigns: user.myContributedCampaigns,
-    });
+    if (user) {
+      return res.status(200).send({
+        isError: false,
+        myContributedCampaigns: user.myContributedCampaigns,
+      });
+    } else {
+      return sendErrorMessage(res, 200, "This user do not exist.");
+    }
   });
 }
 
@@ -322,17 +326,50 @@ module.exports.verifyAuthyOtp = (req, res) => {
   User.findOne({email:_email}, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
 
-    if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
+    if (user) {
+      if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
 
-    let secret = user.secret;
-    let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
+      let secret = user.secret;
+      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
 
-    if (isAuthyCorrect == true) {
-      return res.status(200).send({
-        isError: false
-      });
+      if (isAuthyCorrect == true) {
+        return res.status(200).send({
+          isError: false
+        });
+      } else {
+        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+      }
     } else {
-      return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+      return sendErrorMessage(res, 200, "This user do not exist.")
     }
   })
+}
+
+
+
+module.exports.forgotPassword = (req, res) => {
+  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+
+  const _email = req.body.email;
+  const _otp = req.body.otp;
+
+  // check if this user is already verified or not from the DB?
+  User.findOne({email:_email}, async (err, user) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+
+    if (user) {
+      let secret = user.secret;
+      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
+
+      if (isAuthyCorrect == true) {
+        return res.status(200).send({
+          isError: false
+        });
+      } else {
+        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+      }
+    } else {
+      return sendErrorMessage(res, 200, "User with this email ID do not exist.");
+    }
+  });
 }

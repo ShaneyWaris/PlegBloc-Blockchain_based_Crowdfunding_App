@@ -19,5 +19,7 @@ router.post("/verifyEmail", homeController.verifyEmail);
 router.post("/contact-us", homeController.contactus);
 router.post("/verifyAuthyOtp", homeController.verifyAuthyOtp);
 
+router.post("/forgotPassword", homeController.forgotPassword);
+
 
 module.exports = router;
