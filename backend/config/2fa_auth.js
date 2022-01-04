@@ -26,11 +26,11 @@ const isVerified = (_secret, _encoding, _otp) => {
 }
 
 // async function main() {
-//     let s = generateSecret();
-//     console.log(s);
-//     let qr_code = await generateQRCode(s);
-//     console.log(qr_code);
-// }
+    // let s = generateSecret();
+    // console.log(s);
+    // let qr_code = await generateQRCode(s);
+    // console.log(qr_code);
+}
 // main();
 
 module.exports = {

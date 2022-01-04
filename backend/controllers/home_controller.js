@@ -276,7 +276,7 @@ module.exports.verifyEmail = async (req, res) => {
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
 
-        return sendErrorMessage(res, 200, "Verification link has expired, we are sending an another OTP. Please verify on time. You have only 2 minutes.");
+        return sendErrorMessage(res, 200, "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID.");
         // user has clicked the button very late.
         // again send the another otp, and say this in alert that an another otp has been transfered to their account.
       }
@@ -286,12 +286,6 @@ module.exports.verifyEmail = async (req, res) => {
   })
   
 }
-
-
-module.exports.verifyAuthyOtp = (req, res) => {
-
-}
-
 
 module.exports.contactus = async (req, res) => {
   const name = req.body.name;
@@ -326,7 +320,7 @@ module.exports.verifyAuthyOtp = (req, res) => {
     if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
 
     let secret = user.secret;
-    let isAuthyCorrect = isVerified(secret, "ascii", _otp);
+    let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
 
     if (isAuthyCorrect == true) {
       return res.status(200).send({
