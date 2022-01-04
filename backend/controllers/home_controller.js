@@ -320,7 +320,7 @@ module.exports.verifyAuthyOtp = (req, res) => {
     if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
 
     let secret = user.secret;
-    let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
+    let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
 
     if (isAuthyCorrect == true) {
       return res.status(200).send({
