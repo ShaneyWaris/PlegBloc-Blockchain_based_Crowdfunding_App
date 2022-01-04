@@ -5,8 +5,6 @@ const User = require("../models/user");
 const Campaign = require("../models/campaign");
 const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_auth');
 const {genOtp, verifyOtp} = require('./../config/otp');
-// const jwt = require("jsonwebtoken");
-// const { mongo } = require("mongoose");
 
 
 module.exports.home = (req, res) => {
