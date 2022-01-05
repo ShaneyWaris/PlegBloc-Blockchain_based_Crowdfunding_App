@@ -3,7 +3,9 @@ import React from "react";
 function VendorRegistration() {
   return (
     <>
-      <h1>Vendor Registration</h1>
+      <div className="my-5">
+        <h1 className="text-center">Vendor Registration</h1>
+      </div>
     </>
   );
 }

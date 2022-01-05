@@ -69,6 +69,7 @@ const VerifyEmail = () => {
         .then((response) => {
           if (response.data.isError) {
             alert(response.data.message);
+            window.close();
           } else {
             navigate("/login");
             alert("Verification Successful. :)");

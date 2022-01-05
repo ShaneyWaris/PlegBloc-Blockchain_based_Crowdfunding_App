@@ -9,12 +9,14 @@ const CreateContract = () => {
   const default_obj = {
     name: "",
     description: "",
+    type: "Others",
     min_amount: "",
     target_amount: "",
   };
   const [data, setData] = useState({
     name: "",
     description: "",
+    type: "Others",
     min_amount: "",
     target_amount: "",
   });
@@ -24,8 +26,11 @@ const CreateContract = () => {
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
-  const InputEvent = (event) => {
+  const [usd, setUSD] = useState(0.0);
+
+  const InputEvent = async (event) => {
     const { name, value } = event.target;
+
     setData((preVal) => {
       return {
         ...preVal,
@@ -33,6 +38,36 @@ const CreateContract = () => {
       };
     });
   };
+
+  const typeChangeHandler = (event) => {
+    const flag = parseInt(event.target.value);
+    var _type = "Others";
+
+    if (flag === 1) {
+      _type = "Goverment Campaigns";
+    } else if (flag === 2) {
+      _type = "Venture Capital Raising Campaigns";
+    } else if (flag === 3) {
+      _type = "Social Cause Campaigns";
+    } else if (flag === 4) {
+      _type = "Others";
+    }
+
+    setData((preVal) => {
+      return {
+        ...preVal,
+        type: _type,
+      };
+    });
+  };
+
+  useEffect(() => {
+    axios
+      .get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD")
+      .then((response) => {
+        setUSD(response.data.USD);
+      });
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -55,52 +90,52 @@ const CreateContract = () => {
     }
   }, []);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setFormDisabled(true);
     setLoading(true);
     if (parseInt(data.target_amount) < parseInt(data.min_amount)) {
       alert("Target Amount should be greater than Minimum Amount");
     } else {
-      const campaignAddressCaller = createCampaign(
+      const address = await createCampaign(
         data.min_amount,
         user.myCampaignFactoryAddress
-      ).then((address) => {
-        if (address !== -1) {
-          const campaign = {
-            manager: user.email,
-            campaignAddress: address,
-            contractFactoryAddress: user.myCampaignFactoryAddress,
-            name: data.name,
-            description: data.description,
-            minAmount: parseInt(data.min_amount),
-            targetAmount: parseInt(data.target_amount),
-          };
+      );
+      if (address !== -1 && address !== "") {
+        const campaign = {
+          manager: user.email,
+          campaignAddress: address,
+          contractFactoryAddress: user.myCampaignFactoryAddress,
+          name: data.name,
+          description: data.description,
+          type: data.type,
+          minAmount: parseInt(data.min_amount),
+          targetAmount: parseInt(data.target_amount),
+        };
 
-          axios
-            .post("http://localhost:8000/createCampaign", campaign, {
-              withCredentials: true,
-            })
-            .then((response) => {
-              if (response.data.isError) {
-                alert(response.data.message);
-              } else {
-                alert("Campaign Created Successfully.");
-                setData(default_obj);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-            .finally(() => {
-              setFormDisabled(false);
-              setLoading(false);
-            });
-        } else {
-          setFormDisabled(false);
-          setLoading(false);
-        }
-      });
+        axios
+          .post("http://localhost:8000/createCampaign", campaign, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data.isError) {
+              alert(response.data.message);
+            } else {
+              alert("Campaign Created Successfully.");
+              setData(default_obj);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            setFormDisabled(false);
+            setLoading(false);
+          });
+      } else {
+        setFormDisabled(false);
+        setLoading(false);
+      }
     }
   };
 
@@ -148,35 +183,65 @@ const CreateContract = () => {
 
               <div className="mb-3">
                 <label for="exampleFormControlInput1" className="form-label">
-                  Minimum Amount for Contribution
+                  Type of Campaign
                 </label>
+                <select
+                  class="form-select"
+                  aria-label="Default select example"
+                  onChange={typeChangeHandler}
+                >
+                  <option selected disabled={isFormDisabled}>
+                    Choose Type of Campaign
+                  </option>
+                  <option value="1">Goverment Campaigns</option>
+                  <option value="2">Venture Capital Raising Campaigns</option>
+                  <option value="3">Social Cause Campaigns</option>
+                  <option value="4">Others</option>
+                </select>
+              </div>
+              <label for="exampleFormControlInput1" className="form-label">
+                Minimum Amount for Contribution
+              </label>
+              <div className="input-group mb-3">
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="exampleFormControlInput1"
                   name="min_amount"
                   value={data.min_amount}
                   onChange={InputEvent}
-                  placeholder="Wei"
+                  placeholder="Eth"
                   disabled={isFormDisabled}
                   required
                 />
+                <span class="input-group-text">
+                  $
+                  {data.min_amount === ""
+                    ? 0.0
+                    : (parseFloat(data.min_amount) * usd).toFixed(5)}
+                </span>
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Target Amount
-                </label>
+              <label for="exampleFormControlInput1" className="form-label">
+                Target Amount
+              </label>
+              <div className="input-group mb-3">
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="exampleFormControlInput1"
                   name="target_amount"
                   value={data.target_amount}
                   onChange={InputEvent}
-                  placeholder="Wei"
+                  placeholder="Eth"
                   disabled={isFormDisabled}
                   required
                 />
+                <span class="input-group-text">
+                  $
+                  {data.target_amount === ""
+                    ? 0.0
+                    : (parseFloat(data.target_amount) * usd).toFixed(5)}
+                </span>
               </div>
               <div className="col-12">
                 <button

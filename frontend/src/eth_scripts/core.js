@@ -68,6 +68,7 @@ const createCampaign = async (min_amount, factoryAddress) => {
     method: "eth_requestAccounts",
   });
   const web3 = new Web3(provider);
+  min_amount = web3.utils.toWei(min_amount, "ether");
 
   let factory;
   let campaigns;
