@@ -18,7 +18,7 @@ const generateQRCode = async (_secret) => {
 
 const isVerified = (_secret, _encoding, _otp) => {
     let verify = speakeasy.totp.verify({
-        secret: _secret,
+        secret: JSON.parse(_secret).ascii,
         encoding: _encoding,
         token: _otp
     });

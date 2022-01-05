@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCampaignFactory } from "../eth_scripts/core";
 import axios from "axios";
+import { passwordStrength } from 'check-password-strength';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ const Register = () => {
   });
 
   const [passFlag, setPassFlag] = useState(0);
-
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
@@ -31,6 +31,7 @@ const Register = () => {
       setPassFlag(1);
     }
   };
+
 
   const formSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +62,7 @@ const Register = () => {
               alert(response.data.message);
             } else {
               alert(
-                "Account Created Successfully. Verification Mail Sent to Registered Email Id. :)"
+                "Account Created Successfully. Verification mail sent to your registered Email Id. You have only 2 minutes to verify your Email ID. After 2 minutes, link will be expired."
               );
               navigate("/login");
             }
@@ -157,10 +158,10 @@ const Register = () => {
                   Please provide a valid Email Address.
                 </div>
               </div>
-              <div className="mb-3">
-                <label for="exampleInputPassword1" className="form-label">
+              <label for="exampleInputPassword1" className="form-label">
                   Password
-                </label>
+              </label>
+              <div className="input-group mb-3">
                 <input
                   type="password"
                   className="form-control"
@@ -172,16 +173,19 @@ const Register = () => {
                   disabled={isFormDisabled}
                   required
                 />
+                <span class="input-group-text">
+                {data.password === "" ? "Too Week" : (passwordStrength(data.password).value)}
+                </span>
                 <div id="passwordHelpBlock" class="form-text">
-                  Your password must be 8-20 characters long, contain letters
-                  and numbers, and must not contain spaces, special characters,
-                  or emoji.
+                  Your password should be 8-20 characters long, contain lowercase and uppercase alphabets,
+                   numbers, and special characters.
                 </div>
+                
               </div>
-              <div className="mb-3">
-                <label for="exampleInputPassword1" className="form-label">
+              <label for="exampleInputPassword1" className="form-label">
                   Confirm Password
-                </label>
+              </label>
+              <div className="input-group mb-3">  
                 <input
                   type="password"
                   className="form-control"
@@ -193,7 +197,11 @@ const Register = () => {
                   disabled={isFormDisabled}
                   required
                 />
-                {passFlag === 1 && data.confirm_password === data.password && (
+                <span class="input-group-text">
+                {data.confirm_password === "" ? "Too Week" : (passwordStrength(data.confirm_password).value)}
+                </span>
+              </div>
+              {passFlag === 1 && data.confirm_password === data.password && (
                   <div
                     id="passwordHelpBlock2"
                     class="form-text"
@@ -211,8 +219,7 @@ const Register = () => {
                     &#x2718; Password and Confirm Password do not match.
                   </div>
                 )}
-              </div>
-              <div className="col-12">
+              <div className="col-12 mt-4">
                 <button
                   className="btn btn-outline-primary mb-5"
                   type="submit"

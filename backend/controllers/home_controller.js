@@ -4,7 +4,7 @@ const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
 const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_auth');
-const {genOtp, verifyOtp} = require('./../config/otp');
+const {genOtp, verifyOtp, encrypt, decrypt} = require('./../config/otp');
 
 
 // This is the home page for backend.
@@ -80,26 +80,26 @@ module.exports.signin = async (req, res) => {
         // send otp again.
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
-        return sendErrorMessage(res, 200, "You need to verify your email ID first.");
+        return sendErrorMessage(res, 200, "You need to verify your email ID first. We have sent a link to your email. You have only 2 minutes to verify your email ID.");
       }
 
-      let secret = user.secret;
-      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
+      await decrypt(user.secret).then((secret) => {
+        let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
 
-      if (isAuthyCorrect == true) {
-        // Generate access token.
-        const accessToken = generateToken(_email);
-        // set this access token into cookies.
-        res.cookie("token", accessToken);
-        console.log("Sign In successfully.");
-        return res.status(200).json({
-          isError: false,
-          user: user,
-        });
-      } else {
-        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
-      }
+        if (isAuthyCorrect == true) {
+          const accessToken = generateToken(_email);  // Generate access token.
+          res.cookie("token", accessToken);  // set this access token into cookies.
+          console.log("Sign In successfully.");
+          return res.status(200).json({
+            isError: false,
+            user: user,
+          });
+        } else {
+          return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+        }
+      });
     } else {
+      res.clearCookie("token");
       return sendErrorMessage(res, 200, "This user do not exist!");
     }
   });
@@ -144,7 +144,7 @@ module.exports.createCampaign = async (req, res) => {
             if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
             if (user) {
-              await user.myCreatedCampaigns.push(campaign);
+              await user.myCreatedCampaigns.push(campaign.campaignAddress);
               await user.save();
 
               return res.status(200).send({
@@ -152,6 +152,7 @@ module.exports.createCampaign = async (req, res) => {
                 message: "Campaign Created Successfully.",
               });
             } else {
+              res.clearCookie("token");
               return sendErrorMessage(res, 200, "User who wants to create this campaign do not exist.");
             }
           });
@@ -173,10 +174,15 @@ module.exports.getUser = (req, res) => {
   User.findOne({ email: _email }, (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
-    return res.status(200).send({
-      isError: false,
-      user: user,
-    });
+    if (user) {
+      return res.status(200).send({
+        isError: false,
+        user: user,
+      });
+    } else {
+      res.clearCookie("token");
+      return sendErrorMessage(res, 200, "This user do not exist!");
+    }
   });
 };
 
@@ -189,13 +195,18 @@ module.exports.updateUser = async (req, res) => {
   User.findOne({ email: _email }, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
-    user = updateUserValues(user, _user);
-    await user.save();
-    
-    return res.status(200).send({
-      isError: false,
-      message: `User details updated with email ID ${_email}.`,
-    });
+    if (user) {
+      user = updateUserValues(user, _user);
+      await user.save();
+      
+      return res.status(200).send({
+        isError: false,
+        message: `User details updated with email ID ${_email}.`,
+      });
+    } else {
+      res.clearCookie("token");
+      return sendErrorMessage(res, 200, "This user do not exist!");
+    }
   });
 };
 
@@ -262,6 +273,7 @@ module.exports.myContributedCampaigns = (req, res) => {
         myContributedCampaigns: user.myContributedCampaigns,
       });
     } else {
+      res.clearCookie("token");
       return sendErrorMessage(res, 200, "This user do not exist.");
     }
   });
@@ -285,11 +297,11 @@ module.exports.verifyEmail = async (req, res) => {
       let isOtpCorrect = await verifyOtp(_otp, _email);
       if (isOtpCorrect == true) {
         // generate qr-code and send it to my user.
-        const secret = generateSecret();
+        const secret = generateSecret();     // JSON object
         const qrcode = await generateQRCode(secret);
 
-        user.isVerified = true;
-        user.secret = secret;
+        // user.isVerified = true;
+        user.secret = await encrypt(JSON.stringify(secret));
         await user.save();
 
         res.status(200).send({
@@ -305,6 +317,7 @@ module.exports.verifyEmail = async (req, res) => {
         return sendErrorMessage(res, 200, "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID.");
       }
     } else {
+        res.clearCookie("token");
         return sendErrorMessage(res, 200, "This user do not exist.");
     }
   })  
@@ -333,7 +346,7 @@ module.exports.contactus = async (req, res) => {
 
 
 // verify authy OTP.
-module.exports.verifyAuthyOtp = (req, res) => {
+module.exports.verifyAuthyOtp = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
@@ -343,19 +356,20 @@ module.exports.verifyAuthyOtp = (req, res) => {
     if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
 
     if (user) {
-      if (user.isVerified == false) return sendErrorMessage(res, 200, "You need to verify your email ID first.");
-
-      let secret = user.secret;
-      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
-
-      if (isAuthyCorrect == true) {
-        return res.status(200).send({
-          isError: false
-        });
-      } else {
-        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
-      }
+      await decrypt(user.secret).then(async (secret) => {
+        let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
+        if (isAuthyCorrect == true) {
+          user.isVerified = true;
+          await user.save();
+          return res.status(200).send({
+            isError: false
+          });
+        } else {
+          return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+        }
+      });
     } else {
+      res.clearCookie("token");
       return sendErrorMessage(res, 200, "This user do not exist.")
     }
   })
@@ -363,7 +377,7 @@ module.exports.verifyAuthyOtp = (req, res) => {
 
 
 // Forgot Password.
-module.exports.forgotPassword = (req, res) => {
+module.exports.forgotPassword = async (req, res) => {
   if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
@@ -374,17 +388,18 @@ module.exports.forgotPassword = (req, res) => {
     if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
 
     if (user) {
-      let secret = user.secret;
-      let isAuthyCorrect = isVerified(secret.ascii, "ascii", parseInt(_otp));
-
-      if (isAuthyCorrect == true) {
-        return res.status(200).send({
-          isError: false
-        });
-      } else {
-        return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
-      }
+      await decrypt(user.secret).then((secret) => {
+        let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
+        if (isAuthyCorrect == true) {
+          return res.status(200).send({
+            isError: false
+          });
+        } else {
+          return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
+        }
+      });
     } else {
+      res.clearCookie("token");
       return sendErrorMessage(res, 200, "User with this email ID do not exist.");
     }
   });
@@ -409,6 +424,7 @@ module.exports.updatePassword = async (req, res) => {
         isError: false
       });
     } else {
+      res.clearCookie("token");
       return sendErrorMessage(res, 200, "This user do not exist.")
     }
   });  

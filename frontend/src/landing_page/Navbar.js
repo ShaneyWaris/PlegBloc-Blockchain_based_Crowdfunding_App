@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+// import logo from "../../src/images/logo.png";
 
 const Navbar = () => {
   return (
@@ -9,6 +10,13 @@ const Navbar = () => {
           <div className="col-10 mx-auto">
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
               <div className="container-fluid">
+              {/* <div className="" style={{width:"125px"}}>
+                  <img
+                    src={logo}
+                    className="img-fluid animated"
+                    alt=""
+                  />
+                </div> */}
                 <NavLink end className="navbar-brand" to="/">
                   PlegBloc
                 </NavLink>

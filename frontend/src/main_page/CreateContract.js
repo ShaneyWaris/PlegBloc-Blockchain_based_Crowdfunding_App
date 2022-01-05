@@ -44,12 +44,14 @@ const CreateContract = () => {
     var _type = "Others";
 
     if (flag === 1) {
-      _type = "Goverment Campaigns";
+      _type = "Goverment Campaign";
     } else if (flag === 2) {
-      _type = "Venture Capital Raising Campaigns";
+      _type = "Venture Capital Raising Campaign";
     } else if (flag === 3) {
-      _type = "Social Cause Campaigns";
+      _type = "Social Cause Campaign";
     } else if (flag === 4) {
+      _type = "Medical Campaign";
+    } else if (flag == 5) {
       _type = "Others";
     }
 
@@ -193,10 +195,11 @@ const CreateContract = () => {
                   <option selected disabled={isFormDisabled}>
                     Choose Type of Campaign
                   </option>
-                  <option value="1">Goverment Campaigns</option>
-                  <option value="2">Venture Capital Raising Campaigns</option>
-                  <option value="3">Social Cause Campaigns</option>
-                  <option value="4">Others</option>
+                  <option value="1">Goverment Campaign</option>
+                  <option value="2">Venture Capital Raising Campaign</option>
+                  <option value="3">Social Cause Campaign</option>
+                  <option value="4">Medical Campaign</option>
+                  <option value="5">Others</option>
                 </select>
               </div>
               <label for="exampleFormControlInput1" className="form-label">

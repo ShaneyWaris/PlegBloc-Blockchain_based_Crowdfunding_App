@@ -41,6 +41,7 @@ const VerifyEmail = () => {
       .then((response) => {
         if (response.data.isError) {
           alert(response.data.message);
+          window.close();
         } else {
           alert("Email Verified Successfully");
           const qr_code = response.data.qr_code;
@@ -69,7 +70,6 @@ const VerifyEmail = () => {
         .then((response) => {
           if (response.data.isError) {
             alert(response.data.message);
-            window.close();
           } else {
             navigate("/login");
             alert("Verification Successful. :)");
@@ -102,14 +102,14 @@ const VerifyEmail = () => {
             <h3>{"Steps to Follow"}</h3>
             <br />
             <p style={{ textAlign: "justify" }}>
-              1. Thanks for verifying your email ID. This is the last stage of
-              verification.
+              1. Thanks for verifying your email ID. This is the <b>Important</b> as well as the last stage of
+              verification. Please do not close this page.
               <br />
               <br />
               2. Since we are working in the finance domain, we take security as
               our utmost priority. So now you need to download the “authy”
               application. It is available in the Play Store, Apple store and as
-              a web application as well.
+              a web application too.
               <br />
               <ul>
                 <li>
@@ -138,18 +138,20 @@ const VerifyEmail = () => {
                 </li>
               </ul>
               <br />
-              3. Create your account with authy and after successful creation of
-              the account, you need to scan this QR-code.
+              3. Create your account in authy and after a successful creation of
+              your account, you need to scan this QR Code.
               <br />
               <br />
               4. After scanning, you will get a 6 digit OTP, which you need to
               enter below and hit the submit button.
               <br />
               <br />
-              5. Please save this application on your mobile/web and enable the
-              backup option in the accounts tab. So that even if you uninstall
-              the app in future. You can recover all your authy accounts easily
+              5. Please enable the backup option in the accounts tab in Authy app. So that even if you accidently uninstall
+              the app OR if you do not have the access of your mobile in future. You can recover all your authy accounts easily
               when you will install it again.
+              <br/>
+              <br/>
+              6. We would recommend Authy app only because of its backup and security features, but you can also use "Google Authenticator" or "Microsoft Authenticator" apps as well.
             </p>
           </div>
 
