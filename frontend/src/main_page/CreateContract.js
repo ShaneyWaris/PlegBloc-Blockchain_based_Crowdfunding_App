@@ -109,8 +109,8 @@ const CreateContract = () => {
           name: data.name,
           description: data.description,
           type: data.type,
-          minAmount: parseInt(data.min_amount),
-          targetAmount: parseInt(data.target_amount),
+          minAmount: data.min_amount,
+          targetAmount: data.target_amount,
         };
 
         axios

@@ -119,6 +119,7 @@ module.exports.createCampaign = async (req, res) => {
   const _campaignType = req.body.type;
   const _campaignMinAmount = req.body.minAmount;
   const _campaignTargetAmount = req.body.targetAmount;
+  console.log(_campaignMinAmount, _campaignTargetAmount);
 
   Campaign.findOne({ campaignAddress: _campaignAddress }, async (err, campaign) => {
       if (err) return sendErrorMessage(res, 200, "Error while finding this camapign from DB");

@@ -30,11 +30,11 @@ const campaignSchema = new mongoose.Schema({
         required: true,
     },
     minAmount: {
-        type: String,
+        type: Number,
         required: true,
     },
     targetAmount: {
-        type: String,
+        type: Number,
         required: true,
     },
     isActive: {
