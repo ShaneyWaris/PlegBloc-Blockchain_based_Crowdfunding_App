@@ -34,9 +34,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    authySecret: {
-        type: Object,
-    },
     myCreatedCampaigns: [{
         type: Object
     }],

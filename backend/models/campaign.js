@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const campaignSchema = new mongoose.Schema({
     // Required Fields.
     // Manager is the one who create the campaign?
-    manager: {                  // email ID
+    manager: {                  // user email ID
         type: String,
         required: true
     },
@@ -22,6 +22,10 @@ const campaignSchema = new mongoose.Schema({
         required: true,
     },
     description: {
+        type: String,
+        required: true,
+    },
+    type: {
         type: String,
         required: true,
     },

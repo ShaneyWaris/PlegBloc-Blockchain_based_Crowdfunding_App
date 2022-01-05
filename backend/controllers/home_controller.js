@@ -110,28 +110,30 @@ module.exports.signin = async (req, res) => {
 module.exports.createCampaign = async (req, res) => {
   // User needs to be authenticated to create a campaign.
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-  console.log("createCampaign: ", req.body);
-
-  const _campaignName = req.body.name;
-  const _campaignDesc = req.body.description;
-  const _campaignMinAmount = req.body.minAmount;
-  const _campaignTargetAmount = req.body.targetAmount;
+  
+  const _managerEmail = req.body.manager;
   const _campaignAddress = req.body.campaignAddress;
   const _contractFactoryAddress = req.body.contractFactoryAddress;
-  const _managerEmail = req.body.manager;
+  const _campaignName = req.body.name;
+  const _campaignDesc = req.body.description;
+  const _campaignType = req.body.type;
+  const _campaignMinAmount = req.body.minAmount;
+  const _campaignTargetAmount = req.body.targetAmount;
 
   Campaign.findOne({ campaignAddress: _campaignAddress }, async (err, campaign) => {
       if (err) return sendErrorMessage(res, 200, "Error while finding this camapign from DB");
 
+      // If this campaign is not already exist, then only create a new campaign. 
       if (!campaign) {
         let campaignObject = {
           manager: _managerEmail,
-          name: _campaignName,
-          description: _campaignDesc,
-          minAmount: _campaignMinAmount,
-          targetAmount: _campaignTargetAmount,
           campaignAddress: _campaignAddress,
           contractFactoryAddress: _contractFactoryAddress,
+          name: _campaignName,
+          description: _campaignDesc,
+          type: _campaignType,
+          minAmount: _campaignMinAmount,
+          targetAmount: _campaignTargetAmount,
         };
         Campaign.create(campaignObject, async (err, campaign) => {
           if (err) return sendErrorMessage(res, 200, "Error while creating a campaign.");
@@ -140,17 +142,21 @@ module.exports.createCampaign = async (req, res) => {
           User.findOne({ email: _managerEmail }, async (err, user) => {
             if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
-            await user.myCreatedCampaigns.push(campaign);
-            await user.save();
+            if (user) {
+              await user.myCreatedCampaigns.push(campaign);
+              await user.save();
 
-            return res.status(200).send({
-              isError: false,
-              message: "Campaign Created Successfully.",
-            });
+              return res.status(200).send({
+                isError: false,
+                message: "Campaign Created Successfully.",
+              });
+            } else {
+              return sendErrorMessage(res, 200, "User who wants to create this campaign do not exist.");
+            }
           });
         });
       } else {
-        return sendErrorMessage(res, 200, "This campaign already exist!");
+        return sendErrorMessage(res, 200, "This campaign is already exist.");
       }
     }
   );
