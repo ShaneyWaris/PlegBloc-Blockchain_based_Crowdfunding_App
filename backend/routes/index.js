@@ -32,6 +32,7 @@ router.post("/contact-us", homeController.contactus);
 
 // campaign related routes.
 router.post("/createCampaign", homeController.createCampaign);
+router.post("/getCampaign", homeController.getCampaign);
 router.post("/activeCampaigns", homeController.activeCampaigns);
 router.post("/myCampaigns", homeController.myCampaigns);
 router.post("/myContributedCampaigns", homeController.myContributedCampaigns);

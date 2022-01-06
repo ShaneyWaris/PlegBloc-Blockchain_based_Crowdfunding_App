@@ -428,3 +428,56 @@ module.exports.myContributedCampaigns = (req, res) => {
     }
   });
 }
+
+
+// Get a campaign by providing campaignAddress and userEmail id.
+module.exports.getCampaign = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _campaignAddress = req.body.address;
+  const _email = req.body.email;
+
+  Campaign.findOne({campaignAddress: _campaignAddress}, async (err, campaignObj) => {
+    if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
+    
+    if (campaignObj) {
+      User.findOne({email: _email}, async (err, user) => {
+        if (err) return sendErrorMessage(res, 200, "Error while finding the user from DB.");
+
+        if (user) {
+          let your_contribution = 0, total_backers = 0, total_requests = 0;
+          
+          await campaignObj.contributedUsers.forEach((contributor) => {
+            if (contributor.email == _email) {
+              your_contribution += contributor.amount;
+            }
+          });
+
+          total_backers += campaignObj.contributedUsers.length;
+          total_requests += campaignObj.requests.length;
+          
+          return res.status(200).send({
+            isError: false,
+            campaign: {
+              name: campaignObj.name,
+              description: campaignObj.description,
+              type: campaignObj.type,
+              manager: campaignObj.manager,
+              minAmount: campaignObj.minAmount,
+              targetAmount: campaignObj.targetAmount,
+              currentContribution: campaignObj.currentContribution,
+              yourContribution: your_contribution,
+              totalBackers: total_backers,
+              totalRequests: total_requests
+            }
+          });
+        } else {
+          res.clearCookie("token");
+          return sendErrorMessage(res, 200, "User with email ID provided by you do not exist.");
+        }
+      });
+    } else {
+      return sendErrorMessage(res, 200, "This campaign do not exist.");
+    }
+  });
+}
