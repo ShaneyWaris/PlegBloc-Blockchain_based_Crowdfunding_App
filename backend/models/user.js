@@ -27,19 +27,22 @@ const userSchema = new mongoose.Schema({
         required: true
     },
      // Not Required Fields.
-    secret: {
-        type: Object
+    secret: {                          // secret is stored in encrypted format.
+        type: String
     },
     isVerified: {
         type: Boolean,
         default: false
     },
-    myCreatedCampaigns: [{
+    myCreatedCampaigns: [],            // [ campaignAddress_1, campaignAddress_2, ..., campaignAddress_n ]
+
+    myContributedCampaigns: [{         // [{ campaignAddress: "", amount: "", Date: "" }, {}, ... ]
         type: Object
     }],
-    myContributedCampaigns: [{
-        type: Object
-    }]
+    totalAmountContributed: {
+        type: Number,
+        default: 0
+    }
 }, {
     timestamps: true,
 });

@@ -1,10 +1,10 @@
 require("dotenv").config();
 const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues, sendEmail, sendOTPEmail} = require("./functions");
+const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_auth');
+const {genOtp, verifyOtp, encrypt, decrypt} = require('./../config/otp');
 const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
-const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_auth');
-const {genOtp, verifyOtp, encrypt, decrypt} = require('./../config/otp');
 
 
 // This is the home page for backend.
@@ -106,65 +106,6 @@ module.exports.signin = async (req, res) => {
 };
 
 
-// Create campaign controller.
-module.exports.createCampaign = async (req, res) => {
-  // User needs to be authenticated to create a campaign.
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-  
-  const _managerEmail = req.body.manager;
-  const _campaignAddress = req.body.campaignAddress;
-  const _contractFactoryAddress = req.body.contractFactoryAddress;
-  const _campaignName = req.body.name;
-  const _campaignDesc = req.body.description;
-  const _campaignType = req.body.type;
-  const _campaignMinAmount = req.body.minAmount;
-  const _campaignTargetAmount = req.body.targetAmount;
-  console.log(_campaignMinAmount, _campaignTargetAmount);
-
-  Campaign.findOne({ campaignAddress: _campaignAddress }, async (err, campaign) => {
-      if (err) return sendErrorMessage(res, 200, "Error while finding this camapign from DB");
-
-      // If this campaign is not already exist, then only create a new campaign. 
-      if (!campaign) {
-        let campaignObject = {
-          manager: _managerEmail,
-          campaignAddress: _campaignAddress,
-          contractFactoryAddress: _contractFactoryAddress,
-          name: _campaignName,
-          description: _campaignDesc,
-          type: _campaignType,
-          minAmount: _campaignMinAmount,
-          targetAmount: _campaignTargetAmount,
-        };
-        Campaign.create(campaignObject, async (err, campaign) => {
-          if (err) return sendErrorMessage(res, 200, "Error while creating a campaign.");
-
-          // find the user from the DB and put this campaign into this user campaign list too.
-          User.findOne({ email: _managerEmail }, async (err, user) => {
-            if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
-
-            if (user) {
-              await user.myCreatedCampaigns.push(campaign.campaignAddress);
-              await user.save();
-
-              return res.status(200).send({
-                isError: false,
-                message: "Campaign Created Successfully.",
-              });
-            } else {
-              res.clearCookie("token");
-              return sendErrorMessage(res, 200, "User who wants to create this campaign do not exist.");
-            }
-          });
-        });
-      } else {
-        return sendErrorMessage(res, 200, "This campaign is already exist.");
-      }
-    }
-  );
-};
-
-
 // get User object from the given email ID.
 module.exports.getUser = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
@@ -222,62 +163,6 @@ module.exports.logout = (req, res) => {
     isError: false,
   });
 };
-
-
-// send a list of all active campaigns.
-module.exports.activeCampaigns = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-
-  Campaign.find({}, (err, allActiveCampaigns) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding all campaigns from the DB.");
-
-    // TODO: send only those campaigns whose isActive = true.
-
-    return res.status(200).send({
-      isError: false,
-      allActiveCampaigns: allActiveCampaigns,
-    });
-  });
-};
-
-
-// get all the campaigns created by a user.
-module.exports.myCampaigns = (req, res) =>{
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-
-  const _email = req.body.email;
-
-  Campaign.find({manager: _email}, (err, allMyCampaigns) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding all my campaigns from the DB.");
-
-    return res.status(200).send({
-      isError: false,
-      allMyCampaigns: allMyCampaigns,
-    });
-  });
-} 
-
-
-// get all the campaigns where user has contributed some amount.
-module.exports.myContributedCampaigns = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-
-  const _email = req.body.email;
-
-  User.findOne({email: _email}, (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
-
-    if (user) {
-      return res.status(200).send({
-        isError: false,
-        myContributedCampaigns: user.myContributedCampaigns,
-      });
-    } else {
-      res.clearCookie("token");
-      return sendErrorMessage(res, 200, "This user do not exist.");
-    }
-  });
-}
 
 
 // verify the email ID of a user.
@@ -428,4 +313,118 @@ module.exports.updatePassword = async (req, res) => {
       return sendErrorMessage(res, 200, "This user do not exist.")
     }
   });  
+}
+
+
+// Create campaign controller.
+module.exports.createCampaign = async (req, res) => {
+  // User needs to be authenticated to create a campaign.
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  
+  const _managerEmail = req.body.manager;
+  const _campaignAddress = req.body.campaignAddress;
+  const _contractFactoryAddress = req.body.contractFactoryAddress;
+  const _campaignName = req.body.name;
+  const _campaignDesc = req.body.description;
+  const _campaignType = req.body.type;
+  const _campaignMinAmount = req.body.minAmount;
+  const _campaignTargetAmount = req.body.targetAmount;
+
+  Campaign.findOne({ campaignAddress: _campaignAddress }, async (err, campaign) => {
+      if (err) return sendErrorMessage(res, 200, "Error while finding this camapign from DB");
+
+      // If this campaign is not already exist, then only create a new campaign. 
+      if (!campaign) {
+        let campaignObject = {
+          manager: _managerEmail,
+          campaignAddress: _campaignAddress,
+          contractFactoryAddress: _contractFactoryAddress,
+          name: _campaignName,
+          description: _campaignDesc,
+          type: _campaignType,
+          minAmount: _campaignMinAmount,
+          targetAmount: _campaignTargetAmount,
+        };
+        Campaign.create(campaignObject, async (err, campaign) => {
+          if (err) return sendErrorMessage(res, 200, "Error while creating a campaign.");
+
+          // find the user from the DB and put this campaign into this user campaign list too.
+          User.findOne({ email: _managerEmail }, async (err, user) => {
+            if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+
+            if (user) {
+              await user.myCreatedCampaigns.push(campaign.campaignAddress);
+              await user.save();
+
+              return res.status(200).send({
+                isError: false,
+                message: "Campaign Created Successfully.",
+              });
+            } else {
+              res.clearCookie("token");
+              return sendErrorMessage(res, 200, "User who wants to create this campaign do not exist.");
+            }
+          });
+        });
+      } else {
+        return sendErrorMessage(res, 200, "This campaign is already exist.");
+      }
+    }
+  );
+};
+
+
+// send a list of all active campaigns.
+module.exports.activeCampaigns = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  Campaign.find({}, (err, allActiveCampaigns) => {
+    if (err) return sendErrorMessage(res, 200, "Error in finding all campaigns from the DB.");
+
+    // TODO: send only those campaigns whose isActive = true.
+
+    return res.status(200).send({
+      isError: false,
+      allActiveCampaigns: allActiveCampaigns,
+    });
+  });
+};
+
+
+// get all the campaigns created by a user.
+module.exports.myCampaigns = (req, res) =>{
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _email = req.body.email;
+
+  Campaign.find({manager: _email}, (err, allMyCampaigns) => {
+    if (err) return sendErrorMessage(res, 200, "Error in finding all my campaigns from the DB.");
+
+    return res.status(200).send({
+      isError: false,
+      allMyCampaigns: allMyCampaigns,
+    });
+  });
+} 
+
+
+// get all the campaigns where user has contributed some amount.
+module.exports.myContributedCampaigns = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _email = req.body.email;
+
+  User.findOne({email: _email}, (err, user) => {
+    if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+
+    if (user) {
+      return res.status(200).send({
+        isError: false,
+        myContributedCampaigns: user.myContributedCampaigns,
+      });
+    } else {
+      res.clearCookie("token");
+      return sendErrorMessage(res, 200, "This user do not exist.");
+    }
+  });
 }

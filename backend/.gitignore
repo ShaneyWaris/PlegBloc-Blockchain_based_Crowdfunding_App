@@ -1,5 +1,6 @@
 # Files
 .env
+/config/captcha.js
 package-lock.json
 
 # Folders

@@ -106,9 +106,11 @@ const Profile = () => {
         })
         .then((response) => {
           console.log(response.data.message);
+          alert("Profile Updated Successfully.");
         })
         .catch((error) => {
           console.error("Error fetching data: ", error);
+          alert(error);
         })
         .finally(() => {
           console.log("Update Done");

@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 
 const campaignSchema = new mongoose.Schema({
     // Required Fields.
-    // Manager is the one who create the campaign?
-    manager: {                  // user email ID
+    manager: {
         type: String,
         required: true
     },
@@ -42,12 +41,16 @@ const campaignSchema = new mongoose.Schema({
         default: true
     },
     // Not Required Fields.
-    requests: [{
+    requests: [{                                                
         type: Object
     }],
-    contributedUsers: [{
-        type: Object
+    contributedUsers: [{        // [ { email: "", amount: "", Date: "" }, {}, ....., {} ] => No. of backers
+        type: Object        
     }],
+    currentContribution: {      // sum of all the contributions received from all users.
+        type: Number,
+        default: 0
+    }
 }, {
     timestamps: true,
 });
