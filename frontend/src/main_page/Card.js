@@ -23,7 +23,9 @@ const Card = (props) => {
           <img src={props.imgsrc} className="card-img-top" alt={props.imgsrc} />
           <div className="card-body">
             <h5 className="card-title font-weight-bold">{props.title}</h5>
-            <p className="card-text">{props.des}</p>
+            <p className="card-text" style={{ textAlign: "justify" }}>
+              {props.des}
+            </p>
             <button
               type="submit"
               className="btn btn-primary"

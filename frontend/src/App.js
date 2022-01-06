@@ -11,6 +11,7 @@ import LogIn from "./landing_page/LogIn";
 import Register from "./landing_page/Register";
 import ForgotPasswordAuth from "./landing_page/ForgotPasswordAuth";
 import UpdatePassword from "./landing_page/UpdatePassword";
+import VerifyEmail from "./landing_page/VerifyEmail";
 import Navbar from "./landing_page/Navbar";
 
 import AllContracts from "./main_page/AllContracts";
@@ -18,6 +19,12 @@ import Contributions from "./main_page/Contributions";
 import PersonalCampaigns from "./main_page/PersonalCampaigns";
 import CreateContract from "./main_page/CreateContract";
 import Profile from "./main_page/Profile";
+import VendorRegistration from "./main_page/VendorRegistration";
+import RequestsPage from "./main_page/RequestsPage";
+import CreateRequest from "./main_page/CreateRequest";
+import ManagerInfo from "./main_page/ManagerInfo";
+import CampaignDetail from "./main_page/CampaignDetail";
+import CampaignDisp from "./main_page/CampaignDisp";
 import MainNavBar from "./main_page/MainNavBar";
 
 import Footer from "./Footer";
@@ -25,9 +32,6 @@ import Footer from "./Footer";
 import { isAuthenticated } from "./auth/helper";
 import PublicRoute from "./auth/PublicRoute";
 import PrivateRoute from "./auth/PrivateRoute";
-import CampaignDetail from "./main_page/CampaignDetail";
-import VerifyEmail from "./landing_page/VerifyEmail";
-import VendorRegistration from "./main_page/VendorRegistration";
 
 const App = () => {
   return (
@@ -171,6 +175,45 @@ const App = () => {
           element={
             <PrivateRoute>
               <CampaignDetail />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/viewRequests"
+          element={
+            <PrivateRoute>
+              <RequestsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          end
+          path="/createRequest"
+          element={
+            <PrivateRoute>
+              <CreateRequest />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/managerInfo"
+          element={
+            <PrivateRoute>
+              <ManagerInfo />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/campaigns/:email"
+          element={
+            <PrivateRoute>
+              <CampaignDisp />
             </PrivateRoute>
           }
         />

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Common from "./Common";
-import { injectMetaMask, createCampaignFactory } from "../eth_scripts/core";
 import { isAuthenticated, getCurrentUser } from "../auth/helper";
+import Spinner from "./Spinner";
 
 import axios from "axios";
 
 const AllContracts = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [visib, setVisib] = useState("visible");
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -21,49 +22,20 @@ const AllContracts = () => {
             console.log(response.data.message);
           } else {
             const user = response.data.user;
-            console.log(user);
-            if (
-              user.myCampaignFactoryAddress !== null &&
-              user.myCampaignFactoryAddress === ""
-            ) {
-              const campaignFactoryAddress = createCampaignFactory().then(
-                (address) => {
-                  user.myCampaignFactoryAddress = address;
-                  const data = {
-                    email: user_email,
-                    user: user,
-                  };
-                  axios
-                    .post("http://localhost:8000/updateUser", data, {
-                      withCredentials: true,
-                    })
-                    .then((response) => {
-                      console.log(response.data.message);
-                    })
-                    .catch((error) => {
-                      console.error("Error fetching data: ", error);
-                    })
-                    .finally(() => {
-                      console.log("Factory Done");
-                    });
+            axios
+              .post(
+                "http://localhost:8000/activeCampaigns",
+                {},
+                { withCredentials: true }
+              )
+              .then((response) => {
+                if (response.data.isError) {
+                  alert(response.data.message);
+                } else {
+                  setCampaigns(response.data.allActiveCampaigns);
+                  setVisib("hidden");
                 }
-              );
-            } else {
-              axios
-                .post(
-                  "http://localhost:8000/activeCampaigns",
-                  {},
-                  { withCredentials: true }
-                )
-                .then((response) => {
-                  if (response.data.isError) {
-                    alert(response.data.message);
-                  } else {
-                    setCampaigns(response.data.allActiveCampaigns);
-                    console.log(campaigns);
-                  }
-                });
-            }
+              });
           }
         })
         .catch((error) => {
@@ -73,11 +45,12 @@ const AllContracts = () => {
           console.log("Done");
         });
     }
-  }, []);
+  }, [campaigns]);
 
   return (
     <>
       <Common title="Active Campaigns" data={campaigns} />
+      <Spinner visib={visib} />
     </>
   );
 };

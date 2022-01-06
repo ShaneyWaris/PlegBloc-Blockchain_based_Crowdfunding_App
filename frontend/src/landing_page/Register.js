@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCampaignFactory } from "../eth_scripts/core";
 import axios from "axios";
-import { passwordStrength } from 'check-password-strength';
+import { passwordStrength } from "check-password-strength";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -31,7 +31,6 @@ const Register = () => {
       setPassFlag(1);
     }
   };
-
 
   const formSubmit = async (e) => {
     e.preventDefault();
@@ -159,7 +158,7 @@ const Register = () => {
                 </div>
               </div>
               <label for="exampleInputPassword1" className="form-label">
-                  Password
+                Password
               </label>
               <div className="input-group mb-3">
                 <input
@@ -174,18 +173,20 @@ const Register = () => {
                   required
                 />
                 <span class="input-group-text">
-                {data.password === "" ? "Too Week" : (passwordStrength(data.password).value)}
+                  {data.password === ""
+                    ? "Too weak"
+                    : passwordStrength(data.password).value}
                 </span>
                 <div id="passwordHelpBlock" class="form-text">
-                  Your password should be 8-20 characters long, contain lowercase and uppercase alphabets,
-                   numbers, and special characters.
+                  Your password should be 8-20 characters long, contain
+                  lowercase and uppercase alphabets, numbers, and special
+                  characters.
                 </div>
-                
               </div>
               <label for="exampleInputPassword1" className="form-label">
-                  Confirm Password
+                Confirm Password
               </label>
-              <div className="input-group mb-3">  
+              <div className="input-group mb-3">
                 <input
                   type="password"
                   className="form-control"
@@ -198,27 +199,29 @@ const Register = () => {
                   required
                 />
                 <span class="input-group-text">
-                {data.confirm_password === "" ? "Too Week" : (passwordStrength(data.confirm_password).value)}
+                  {data.confirm_password === ""
+                    ? "Too weak"
+                    : passwordStrength(data.confirm_password).value}
                 </span>
               </div>
               {passFlag === 1 && data.confirm_password === data.password && (
-                  <div
-                    id="passwordHelpBlock2"
-                    class="form-text"
-                    style={{ color: "green" }}
-                  >
-                    &#10003; Password and Confirm Password match.
-                  </div>
-                )}
-                {passFlag === 1 && data.confirm_password !== data.password && (
-                  <div
-                    id="passwordHelpBlock2"
-                    class="form-text"
-                    style={{ color: "red" }}
-                  >
-                    &#x2718; Password and Confirm Password do not match.
-                  </div>
-                )}
+                <div
+                  id="passwordHelpBlock2"
+                  class="form-text"
+                  style={{ color: "green" }}
+                >
+                  &#10003; Password and Confirm Password match.
+                </div>
+              )}
+              {passFlag === 1 && data.confirm_password !== data.password && (
+                <div
+                  id="passwordHelpBlock2"
+                  class="form-text"
+                  style={{ color: "red" }}
+                >
+                  &#x2718; Password and Confirm Password do not match.
+                </div>
+              )}
               <div className="col-12 mt-4">
                 <button
                   className="btn btn-outline-primary mb-5"

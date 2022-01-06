@@ -2,9 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import Common from "./Common";
+import Spinner from "./Spinner";
 
 const Contributions = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [visib, setVisib] = useState("visible");
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -23,6 +25,7 @@ const Contributions = () => {
           } else {
             setCampaigns(response.data.myContributedCampaigns);
             console.log(campaigns);
+            setVisib("hidden");
           }
         })
         .catch((error) => {
@@ -32,11 +35,12 @@ const Contributions = () => {
           console.log("Done");
         });
     }
-  }, []);
+  }, [campaigns]);
 
   return (
     <div>
       <Common title="My Contributions" data={campaigns} />
+      <Spinner visib={visib} />
     </div>
   );
 };

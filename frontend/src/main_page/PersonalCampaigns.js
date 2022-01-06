@@ -2,9 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import Common from "./Common";
+import Spinner from "./Spinner";
 
 const PersonalCampaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [visib, setVisib] = useState("visible");
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -22,6 +24,7 @@ const PersonalCampaigns = () => {
             alert(response.data.message);
           } else {
             setCampaigns(response.data.allMyCampaigns);
+            setVisib("hidden");
             console.log(campaigns);
           }
         })
@@ -32,11 +35,12 @@ const PersonalCampaigns = () => {
           console.log("Done");
         });
     }
-  }, []);
+  }, [campaigns]);
 
   return (
     <div>
       <Common title="My Campaigns" data={campaigns} />
+      <Spinner visib={visib} />
     </div>
   );
 };
