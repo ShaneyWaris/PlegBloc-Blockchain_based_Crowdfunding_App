@@ -52,7 +52,7 @@ module.exports.signup = async (req, res) => {
         });
       });
     } else {
-      return sendErrorMessage(res, 200, "This email ID is already exist!");
+      return sendErrorMessage(res, 200, "This user is already exist.");
     }
   });
 };
@@ -466,6 +466,7 @@ module.exports.getCampaign = (req, res) => {
               minAmount: campaignObj.minAmount,
               targetAmount: campaignObj.targetAmount,
               currentContribution: campaignObj.currentContribution,
+              contributedUsers: campaignObj.contributedUsers,
               yourContribution: your_contribution,
               totalBackers: total_backers,
               totalRequests: total_requests
