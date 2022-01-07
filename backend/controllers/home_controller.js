@@ -482,3 +482,44 @@ module.exports.getCampaign = (req, res) => {
     }
   });
 }
+
+
+// contribute to a campaign
+module.exports.contribute = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _campaignAddress = req.body.campaignAddress;
+  const _email = req.body.email;
+  const _amount = req.body.amount;
+
+  Campaign.findOne({campaignAddress: _campaignAddress}, (err, campaign) => {
+    if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
+
+    if (campaign) {
+      User.findOne({email: _email}, async (err, user) => {
+        if (err) return sendErrorMessage(res, 200, "Error while finding the user from DB.");
+
+        if (user) {
+
+          user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
+          user.totalAmountContributed += amount;
+          await user.save();
+
+          campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
+          campaign.totalAmountContributed += amount;
+          await campaign.save();
+
+          return res.status(200).send({
+            isError: false
+          });
+
+        } else {
+          res.clearCookie("token");
+          return sendErrorMessage(res, 200, "This user do not exist.");
+        }
+      });
+    } else {
+      return sendErrorMessage(res, 200, "Campaign where you want to contribute do not exist.");
+    }
+  }); 
+}

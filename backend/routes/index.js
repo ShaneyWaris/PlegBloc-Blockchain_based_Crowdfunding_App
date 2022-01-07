@@ -36,6 +36,7 @@ router.post("/getCampaign", homeController.getCampaign);
 router.post("/activeCampaigns", homeController.activeCampaigns);
 router.post("/myCampaigns", homeController.myCampaigns);
 router.post("/myContributedCampaigns", homeController.myContributedCampaigns);
+router.post("/contribute", homeController.contribute);
 
 
 module.exports = router;
