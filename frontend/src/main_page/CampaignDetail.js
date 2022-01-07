@@ -112,7 +112,7 @@ const CampaignDetail = () => {
         );
         if (contribution_flag === 1) {
           const post_data = {
-            email: manager,
+            email: getCurrentUser(),
             campaignAddress: campaignAddress,
             amount: data.amount,
           };
