@@ -3,32 +3,6 @@
 pragma solidity ^0.8.9;
 
 /**
- * @title CampaignFactory
- * @dev CampaignFactory for creating campaign instances
- */
-contract CampaignFactory{
-    address[] public deployed_campaigns;
-    
-    /**
-     * @dev Create new campaigns by providing minimum contribution value
-     * @param min_c Minimum contribution to be made to start a campaign
-     */
-    function createCampaign(uint min_c) public{
-        address new_campaign = address(new Campaign(min_c, msg.sender));
-        deployed_campaigns.push(new_campaign);
-    }
-    
-    /**
-     * @dev Returns a list of campaigns that have been created by the message sender
-     * @return list of addresses of campaigns
-     */
-    function getDeployedCampaigns() public view returns(address[] memory){
-        return deployed_campaigns;
-    }
-}
-
-
-/**
  * @title Campaign
  * @dev Campaign smart contract
  */
@@ -63,10 +37,9 @@ contract Campaign{
     /**
      * @dev Constructor of the campaign
      * @param min_c minimum contribution to start the campaign
-     * @param manager the address of the campaign creator/manager
      */
-    constructor (uint min_c, address manager) {
-        creator = manager;
+    constructor (uint min_c) {
+        creator = msg.sender;
         minimum_contribution = min_c;
         backers_count = 0;
         

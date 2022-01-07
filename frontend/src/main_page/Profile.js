@@ -192,24 +192,7 @@ const Profile = () => {
                   Please provide a valid Email Address.
                 </div>
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Campaign Factory Address
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleFormControlInput1"
-                  name="factory_address"
-                  value={data.factory_address}
-                  onChange={InputEvent}
-                  placeholder=""
-                  disabled
-                />
-                <div className="invalid-feedback">
-                  Please provide a valid Email Address.
-                </div>
-              </div>
+
               <div className="col-12">
                 <button
                   className="btn btn-outline-primary"

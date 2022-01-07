@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import axios from "axios";
 import { createCampaign } from "../eth_scripts/core";
 
 const CreateContract = () => {
-  const navigate = useNavigate();
   const default_obj = {
     name: "",
     description: "",
@@ -99,11 +97,8 @@ const CreateContract = () => {
     if (parseInt(data.target_amount) < parseInt(data.min_amount)) {
       alert("Target Amount should be greater than Minimum Amount");
     } else {
-      const address = await createCampaign(
-        data.min_amount,
-        user.myCampaignFactoryAddress
-      );
-      if (address !== -1 && address !== "") {
+      const address = await createCampaign(data.min_amount);
+      if (address !== "") {
         const campaign = {
           manager: user.email,
           campaignAddress: address,

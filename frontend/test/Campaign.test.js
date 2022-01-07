@@ -4,37 +4,26 @@ const Web3 = require("web3");
 
 const web3 = new Web3(ganache.provider());
 
-const compiledFactory = require("../../frontend/ethereum/build/CampaignFactory.json");
-const compiledCampaign = require("../../frontend/ethereum/build/Campaign.json");
+const compiledCampaign = require("../../frontend/src/ethereum/build/Campaign.json");
 
 let accounts;
-let factory;
-let campaignAddress;
 let campaign;
 
 beforeEach(async () => {
   accounts = await web3.eth.getAccounts();
-  factory = await new web3.eth.Contract(compiledFactory.abi)
+  campaign = await new web3.eth.Contract(compiledCampaign.abi)
     .deploy({
-      data: "0x" + compiledFactory.evm.bytecode.object,
+      data: "0x" + compiledCampaign.evm.bytecode.object,
+      arguments: ["100"],
     })
     .send({
       from: accounts[0],
       gas: "2000000",
     });
-
-  await factory.methods.createCampaign("100").send({
-    from: accounts[0],
-    gas: "2000000",
-  });
-
-  [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
-  campaign = await new web3.eth.Contract(compiledCampaign.abi, campaignAddress);
 });
 
 describe("Campaigns", () => {
-  it("deploys a factory and a campaign", () => {
-    assert.ok(factory.options.address);
+  it("deploys a campaign", () => {
     assert.ok(campaign.options.address);
   });
 
@@ -45,7 +34,7 @@ describe("Campaigns", () => {
 
   it("allows people to contribute money and marks them as approvers", async () => {
     await campaign.methods.contribute().send({
-      value: "200",
+      value: "1000",
       from: accounts[1],
     });
 

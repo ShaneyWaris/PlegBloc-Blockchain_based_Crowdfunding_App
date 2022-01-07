@@ -10,8 +10,6 @@ const Card = (props) => {
       state: {
         manager: props.manager,
         campaignAddress: props.campaignAddress,
-        contractFactoryAddress: props.contractFactoryAddress,
-        campaign: props.campaign,
       },
     });
   };

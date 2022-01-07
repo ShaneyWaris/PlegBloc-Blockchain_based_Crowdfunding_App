@@ -1,31 +1,43 @@
 require("dotenv").config();
-const {sendErrorMessage, isLoggedIn, hash, comparePassword, updateUserValues, sendEmail, sendOTPEmail} = require("./functions");
-const {generateSecret, isVerified, generateQRCode} = require('./../config/2fa_auth');
-const {genOtp, verifyOtp, encrypt, decrypt} = require('./../config/otp');
+const {
+  sendErrorMessage,
+  isLoggedIn,
+  hash,
+  comparePassword,
+  updateUserValues,
+  sendEmail,
+  sendOTPEmail,
+} = require("./functions");
+const {
+  generateSecret,
+  isVerified,
+  generateQRCode,
+} = require("./../config/2fa_auth");
+const { genOtp, verifyOtp, encrypt, decrypt } = require("./../config/otp");
 const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
-
 
 // This is the home page for backend.
 module.exports.home = (req, res) => {
   return sendErrorMessage(res, 200, "Home Page!");
 };
 
-
 // Sign Up controller.
 module.exports.signup = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _name = req.body.name;
   const _username = req.body.username;
   const _email = req.body.email;
   const _phone = req.body.phone;
-  const _password = req.body.password;  // this should be the encrypted password.
+  const _password = req.body.password; // this should be the encrypted password.
   const _myCampaignFactoryAddress = req.body.myCampaignFactoryAddress;
 
   User.findOne({ email: _email }, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding the user in DB");
+    if (err)
+      return sendErrorMessage(res, 200, "Error in finding the user in DB");
 
     if (!user) {
       const hashPassword = await hash(_password);
@@ -35,11 +47,16 @@ module.exports.signup = async (req, res) => {
         email: _email,
         password: hashPassword,
         phone: _phone,
-        myCampaignFactoryAddress: _myCampaignFactoryAddress
+        myCampaignFactoryAddress: _myCampaignFactoryAddress,
       };
 
       User.create(userObject, async (err, user) => {
-        if (err) return sendErrorMessage(res, 200, "Unable to create a user while signUp!");
+        if (err)
+          return sendErrorMessage(
+            res,
+            200,
+            "Unable to create a user while signUp!"
+          );
         console.log("Sign Up successfully.");
 
         // Now first send the mail to user for an OTP.
@@ -57,17 +74,18 @@ module.exports.signup = async (req, res) => {
   });
 };
 
-
 // Sign In controller.
 module.exports.signin = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _password = req.body.password; // this should be the encrypted password.
   const _otp = req.body.otp;
 
   User.findOne({ email: _email }, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding this user from DB");
+    if (err)
+      return sendErrorMessage(res, 200, "Error in finding this user from DB");
 
     if (user) {
       const isSame = await comparePassword(_password, user.password);
@@ -80,15 +98,19 @@ module.exports.signin = async (req, res) => {
         // send otp again.
         let newOtp = await genOtp(_email);
         await sendOTPEmail(user.name, _email, newOtp);
-        return sendErrorMessage(res, 200, "You need to verify your email ID first. We have sent a link to your email. You have only 2 minutes to verify your email ID.");
+        return sendErrorMessage(
+          res,
+          200,
+          "You need to verify your email ID first. We have sent a link to your email. You have only 2 minutes to verify your email ID."
+        );
       }
 
       await decrypt(user.secret).then((secret) => {
         let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
 
         if (isAuthyCorrect == true) {
-          const accessToken = generateToken(_email);  // Generate access token.
-          res.cookie("token", accessToken);  // set this access token into cookies.
+          const accessToken = generateToken(_email); // Generate access token.
+          res.cookie("token", accessToken); // set this access token into cookies.
           console.log("Sign In successfully.");
           return res.status(200).json({
             isError: false,
@@ -105,15 +127,20 @@ module.exports.signin = async (req, res) => {
   });
 };
 
-
 // get User object from the given email ID.
 module.exports.getUser = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _email = req.body.email;
 
   User.findOne({ email: _email }, (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error in finding the user from the DB."
+      );
 
     if (user) {
       return res.status(200).send({
@@ -127,19 +154,23 @@ module.exports.getUser = (req, res) => {
   });
 };
 
-
 // update user profile details.
 module.exports.updateUser = async (req, res) => {
   const _email = req.body.email;
   const _user = req.body.user;
 
   User.findOne({ email: _email }, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error in finding the user from the DB."
+      );
 
     if (user) {
       user = updateUserValues(user, _user);
       await user.save();
-      
+
       return res.status(200).send({
         isError: false,
         message: `User details updated with email ID ${_email}.`,
@@ -151,10 +182,10 @@ module.exports.updateUser = async (req, res) => {
   });
 };
 
-
 // Logout from the account.
 module.exports.logout = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You are already logged out.");
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You are already logged out.");
 
   const _email = req.body.email;
   res.clearCookie("token");
@@ -164,25 +195,31 @@ module.exports.logout = (req, res) => {
   });
 };
 
-
 // verify the email ID of a user.
 module.exports.verifyEmail = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _otp = req.body.otp;
 
   // check if this user is already verified or not from the DB?
-  User.findOne({email:_email}, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+  User.findOne({ email: _email }, async (err, user) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error while finding the user from the DB."
+      );
 
     if (user) {
-      if (user.isVerified == true) return sendErrorMessage(res, 200, "This user is already verified.");
+      if (user.isVerified == true)
+        return sendErrorMessage(res, 200, "This user is already verified.");
 
       let isOtpCorrect = await verifyOtp(_otp, _email);
       if (isOtpCorrect == true) {
         // generate qr-code and send it to my user.
-        const secret = generateSecret();     // JSON object
+        const secret = generateSecret(); // JSON object
         const qrcode = await generateQRCode(secret);
 
         // user.isVerified = true;
@@ -191,7 +228,7 @@ module.exports.verifyEmail = async (req, res) => {
 
         res.status(200).send({
           isError: false,
-          qr_code: qrcode
+          qr_code: qrcode,
         });
       } else {
         // send an otp again.
@@ -199,15 +236,18 @@ module.exports.verifyEmail = async (req, res) => {
         await sendOTPEmail(user.name, _email, newOtp);
         // user has clicked the link after 2 minutes.
         // again send the another otp, and say this in alert that an another otp has been transfered to their account.
-        return sendErrorMessage(res, 200, "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID.");
+        return sendErrorMessage(
+          res,
+          200,
+          "Verification link has expired, we have sent an another OTP on your Email. You have only 2 minutes to verify your Email ID."
+        );
       }
     } else {
-        res.clearCookie("token");
-        return sendErrorMessage(res, 200, "This user do not exist.");
+      res.clearCookie("token");
+      return sendErrorMessage(res, 200, "This user do not exist.");
     }
-  })  
-}
-
+  });
+};
 
 // Contact Us.
 module.exports.contactus = async (req, res) => {
@@ -224,21 +264,26 @@ module.exports.contactus = async (req, res) => {
   } else {
     return res.status(200).send({
       isError: true,
-      message: isEmailSent
+      message: isEmailSent,
     });
   }
-}
-
+};
 
 // verify authy OTP.
 module.exports.verifyAuthyOtp = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _otp = req.body.otp;
 
-  User.findOne({email:_email}, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+  User.findOne({ email: _email }, async (err, user) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error while finding the user from the DB."
+      );
 
     if (user) {
       await decrypt(user.secret).then(async (secret) => {
@@ -247,7 +292,7 @@ module.exports.verifyAuthyOtp = async (req, res) => {
           user.isVerified = true;
           await user.save();
           return res.status(200).send({
-            isError: false
+            isError: false,
           });
         } else {
           return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
@@ -255,29 +300,34 @@ module.exports.verifyAuthyOtp = async (req, res) => {
       });
     } else {
       res.clearCookie("token");
-      return sendErrorMessage(res, 200, "This user do not exist.")
+      return sendErrorMessage(res, 200, "This user do not exist.");
     }
-  })
-}
-
+  });
+};
 
 // Forgot Password.
 module.exports.forgotPassword = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _otp = req.body.otp;
 
   // check if this user is already verified or not from the DB?
-  User.findOne({email:_email}, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+  User.findOne({ email: _email }, async (err, user) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error while finding the user from the DB."
+      );
 
     if (user) {
       await decrypt(user.secret).then((secret) => {
         let isAuthyCorrect = isVerified(secret, "ascii", parseInt(_otp));
         if (isAuthyCorrect == true) {
           return res.status(200).send({
-            isError: false
+            isError: false,
           });
         } else {
           return sendErrorMessage(res, 200, "User has entered a wrong OTP.");
@@ -285,42 +335,51 @@ module.exports.forgotPassword = async (req, res) => {
       });
     } else {
       res.clearCookie("token");
-      return sendErrorMessage(res, 200, "User with this email ID do not exist.");
+      return sendErrorMessage(
+        res,
+        200,
+        "User with this email ID do not exist."
+      );
     }
   });
-}
-
+};
 
 // Update Password of a user.
 module.exports.updatePassword = async (req, res) => {
-  if (isLoggedIn(req) == true) return sendErrorMessage(res, 200, "You are already logged in.");
+  if (isLoggedIn(req) == true)
+    return sendErrorMessage(res, 200, "You are already logged in.");
 
   const _email = req.body.email;
   const _newPassword = req.body.password;
 
-  User.findOne({email:_email}, async (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error while finding the user from the DB.");
+  User.findOne({ email: _email }, async (err, user) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error while finding the user from the DB."
+      );
 
     if (user) {
       const hashPassword = await hash(_newPassword);
       user.password = hashPassword;
       await user.save();
       return res.status(200).send({
-        isError: false
+        isError: false,
       });
     } else {
       res.clearCookie("token");
-      return sendErrorMessage(res, 200, "This user do not exist.")
+      return sendErrorMessage(res, 200, "This user do not exist.");
     }
-  });  
-}
-
+  });
+};
 
 // Create campaign controller.
 module.exports.createCampaign = async (req, res) => {
   // User needs to be authenticated to create a campaign.
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
-  
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
+
   const _managerEmail = req.body.manager;
   const _campaignAddress = req.body.campaignAddress;
   const _contractFactoryAddress = req.body.contractFactoryAddress;
@@ -330,10 +389,17 @@ module.exports.createCampaign = async (req, res) => {
   const _campaignMinAmount = req.body.minAmount;
   const _campaignTargetAmount = req.body.targetAmount;
 
-  Campaign.findOne({ campaignAddress: _campaignAddress }, async (err, campaign) => {
-      if (err) return sendErrorMessage(res, 200, "Error while finding this camapign from DB");
+  Campaign.findOne(
+    { campaignAddress: _campaignAddress },
+    async (err, campaign) => {
+      if (err)
+        return sendErrorMessage(
+          res,
+          200,
+          "Error while finding this camapign from DB"
+        );
 
-      // If this campaign is not already exist, then only create a new campaign. 
+      // If this campaign is not already exist, then only create a new campaign.
       if (!campaign) {
         let campaignObject = {
           manager: _managerEmail,
@@ -346,11 +412,21 @@ module.exports.createCampaign = async (req, res) => {
           targetAmount: _campaignTargetAmount,
         };
         Campaign.create(campaignObject, async (err, campaign) => {
-          if (err) return sendErrorMessage(res, 200, "Error while creating a campaign.");
+          if (err)
+            return sendErrorMessage(
+              res,
+              200,
+              "Error while creating a campaign."
+            );
 
           // find the user from the DB and put this campaign into this user campaign list too.
           User.findOne({ email: _managerEmail }, async (err, user) => {
-            if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+            if (err)
+              return sendErrorMessage(
+                res,
+                200,
+                "Error in finding the user from the DB."
+              );
 
             if (user) {
               await user.myCreatedCampaigns.push(campaign.campaignAddress);
@@ -362,7 +438,11 @@ module.exports.createCampaign = async (req, res) => {
               });
             } else {
               res.clearCookie("token");
-              return sendErrorMessage(res, 200, "User who wants to create this campaign do not exist.");
+              return sendErrorMessage(
+                res,
+                200,
+                "User who wants to create this campaign do not exist."
+              );
             }
           });
         });
@@ -373,13 +453,18 @@ module.exports.createCampaign = async (req, res) => {
   );
 };
 
-
 // send a list of all active campaigns.
 module.exports.activeCampaigns = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
 
   Campaign.find({}, (err, allActiveCampaigns) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding all campaigns from the DB.");
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error in finding all campaigns from the DB."
+      );
 
     // TODO: send only those campaigns whose isActive = true.
 
@@ -390,32 +475,42 @@ module.exports.activeCampaigns = (req, res) => {
   });
 };
 
-
 // get all the campaigns created by a user.
-module.exports.myCampaigns = (req, res) =>{
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+module.exports.myCampaigns = (req, res) => {
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _email = req.body.email;
 
-  Campaign.find({manager: _email}, (err, allMyCampaigns) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding all my campaigns from the DB.");
+  Campaign.find({ manager: _email }, (err, allMyCampaigns) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error in finding all my campaigns from the DB."
+      );
 
     return res.status(200).send({
       isError: false,
       allMyCampaigns: allMyCampaigns,
     });
   });
-} 
-
+};
 
 // get all the campaigns where user has contributed some amount.
 module.exports.myContributedCampaigns = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _email = req.body.email;
 
-  User.findOne({email: _email}, (err, user) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
+  User.findOne({ email: _email }, (err, user) => {
+    if (err)
+      return sendErrorMessage(
+        res,
+        200,
+        "Error in finding the user from the DB."
+      );
 
     if (user) {
       return res.status(200).send({
@@ -427,58 +522,77 @@ module.exports.myContributedCampaigns = (req, res) => {
       return sendErrorMessage(res, 200, "This user do not exist.");
     }
   });
-}
-
+};
 
 // Get a campaign by providing campaignAddress and userEmail id.
 module.exports.getCampaign = (req, res) => {
-  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  if (isLoggedIn(req) == false)
+    return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _campaignAddress = req.body.address;
   const _email = req.body.email;
 
-  Campaign.findOne({campaignAddress: _campaignAddress}, async (err, campaignObj) => {
-    if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
-    
-    if (campaignObj) {
-      User.findOne({email: _email}, async (err, user) => {
-        if (err) return sendErrorMessage(res, 200, "Error while finding the user from DB.");
+  Campaign.findOne(
+    { campaignAddress: _campaignAddress },
+    async (err, campaignObj) => {
+      if (err)
+        return sendErrorMessage(
+          res,
+          200,
+          "Error in finding a campaign from the DB."
+        );
 
-        if (user) {
-          let your_contribution = 0, total_backers = 0, total_requests = 0;
-          
-          await campaignObj.contributedUsers.forEach((contributor) => {
-            if (contributor.email == _email) {
-              your_contribution += contributor.amount;
-            }
-          });
+      if (campaignObj) {
+        User.findOne({ email: _email }, async (err, user) => {
+          if (err)
+            return sendErrorMessage(
+              res,
+              200,
+              "Error while finding the user from DB."
+            );
 
-          total_backers += campaignObj.contributedUsers.length;
-          total_requests += campaignObj.requests.length;
-          
-          return res.status(200).send({
-            isError: false,
-            campaign: {
-              name: campaignObj.name,
-              description: campaignObj.description,
-              type: campaignObj.type,
-              manager: campaignObj.manager,
-              minAmount: campaignObj.minAmount,
-              targetAmount: campaignObj.targetAmount,
-              currentContribution: campaignObj.currentContribution,
-              contributedUsers: campaignObj.contributedUsers,
-              yourContribution: your_contribution,
-              totalBackers: total_backers,
-              totalRequests: total_requests
-            }
-          });
-        } else {
-          res.clearCookie("token");
-          return sendErrorMessage(res, 200, "User with email ID provided by you do not exist.");
-        }
-      });
-    } else {
-      return sendErrorMessage(res, 200, "This campaign do not exist.");
+          if (user) {
+            let your_contribution = 0,
+              total_backers = 0,
+              total_requests = 0;
+
+            await campaignObj.contributedUsers.forEach((contributor) => {
+              if (contributor.email == _email) {
+                your_contribution += contributor.amount;
+              }
+            });
+
+            total_backers += campaignObj.contributedUsers.length;
+            total_requests += campaignObj.requests.length;
+
+            return res.status(200).send({
+              isError: false,
+              campaign: {
+                name: campaignObj.name,
+                description: campaignObj.description,
+                type: campaignObj.type,
+                manager: campaignObj.manager,
+                minAmount: campaignObj.minAmount,
+                targetAmount: campaignObj.targetAmount,
+                currentContribution: campaignObj.currentContribution,
+                contributedUsers: campaignObj.contributedUsers,
+                yourContribution: your_contribution,
+                totalBackers: total_backers,
+                totalRequests: total_requests,
+              },
+            });
+          } else {
+            res.clearCookie("token");
+            return sendErrorMessage(
+              res,
+              200,
+              "User with email ID provided by you do not exist."
+            );
+          }
+        });
+      } else {
+        return sendErrorMessage(res, 200, "This campaign do not exist.");
+      }
     }
-  });
-}
+  );
+};

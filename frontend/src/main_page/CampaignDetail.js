@@ -3,12 +3,11 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import CampInfoCard from "./CampInfoCard";
-import logo from "../../src/images/final-logo.png";
 
 const CampaignDetail = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { manager, campaignAddress, _, __ } = state;
+  const { manager, campaignAddress } = state;
   const [data, setData] = useState({ amount: 0 });
   const [isContriLoading, setContriLoading] = useState(false);
   const [role, setRole] = useState("dummy");
@@ -63,7 +62,7 @@ const CampaignDetail = () => {
       .then((response) => {
         setUSD(response.data.USD);
       });
-  }, [usd]);
+  }, []);
 
   const InputEvent = (event) => {
     const { name, value } = event.target;

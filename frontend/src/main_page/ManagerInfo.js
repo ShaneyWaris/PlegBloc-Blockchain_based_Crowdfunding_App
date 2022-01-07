@@ -107,19 +107,7 @@ function ManagerInfo() {
                   disabled
                 />
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Campaign Factory Address
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleFormControlInput1"
-                  name="factory_address"
-                  value={user.myCampaignFactoryAddress}
-                  disabled
-                />
-              </div>
+
               <label for="exampleFormControlInput1" className="form-label">
                 No. of Campaigns
               </label>
