@@ -469,6 +469,7 @@ module.exports.getCampaign = (req, res) => {
             totalBackers: total_backers,
             totalRequests: total_requests
           };
+          console.log("\n getCampaign(): ", campaign_obj);
 
           return res.status(200).send({
             isError: false,
@@ -494,6 +495,8 @@ module.exports.contribute = (req, res) => {
   const _email = req.body.email;
   const _amount = parseFloat(req.body.amount);
 
+  console.log("\n contribute-request", _email, _amount);
+
   Campaign.findOne({campaignAddress: _campaignAddress}, (err, campaign) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
 
@@ -503,17 +506,37 @@ module.exports.contribute = (req, res) => {
 
         if (user) {
 
-          console.log(user);
-          user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
+          console.log("contribute-user-1: ", user.totalAmountContributed, user.myContributedCampaigns);
+          let userFlag = 0;
+          await user.myContributedCampaigns.forEach((userContribution) => {
+            if (userContribution.campaignAddress == _campaignAddress) {
+              userContribution.amount += _amount;
+              userFlag = 1;
+            }
+          });
+          if (userFlag == 0) {
+            user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
+          }
           user.totalAmountContributed += _amount;
-          await user.save().then(()=>{console.log(user)});
+          await user.save().then(()=>{console.log("contribute-user-2: ", user.totalAmountContributed, user.myContributedCampaigns)});
           
 
-          console.log("me yaha hun");
-          console.log(campaign);
-          campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
-          campaign.totalAmountContributed += _amount;
-          await campaign.save().then(()=>{console.log(campaign)});
+          console.log("\n\n");
+
+          console.log("contribute-campaign-1: ", campaign.currentContribution, campaign.contributedUsers);
+          let campaignFlag = 0;
+          await campaign.contributedUsers.forEach((contributed_user) => {
+            if (contributed_user.email == _email) {
+              contributed_user.amount += _amount;
+              campaignFlag = 1;
+            }
+          });
+          
+          if (campaignFlag == 0) {
+            campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
+          }
+          campaign.currentContribution += _amount;
+          await campaign.save().then(()=>{console.log("contribute-campaign-2: ", campaign.currentContribution, campaign.contributedUsers);});
 
           return res.status(200).send({
             isError: false
