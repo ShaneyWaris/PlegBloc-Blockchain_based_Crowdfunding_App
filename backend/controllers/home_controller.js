@@ -502,11 +502,11 @@ module.exports.contribute = (req, res) => {
         if (user) {
 
           user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
-          user.totalAmountContributed += amount;
+          user.totalAmountContributed += _amount;
           await user.save();
 
           campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
-          campaign.totalAmountContributed += amount;
+          campaign.totalAmountContributed += _amount;
           await campaign.save();
 
           return res.status(200).send({
