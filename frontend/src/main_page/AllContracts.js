@@ -45,7 +45,7 @@ const AllContracts = () => {
           console.log("Done");
         });
     }
-  }, [campaigns]);
+  }, []);
 
   return (
     <>

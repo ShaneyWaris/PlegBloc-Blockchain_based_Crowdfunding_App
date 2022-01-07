@@ -35,7 +35,7 @@ const PersonalCampaigns = () => {
           console.log("Done");
         });
     }
-  }, [campaigns]);
+  }, []);
 
   return (
     <div>

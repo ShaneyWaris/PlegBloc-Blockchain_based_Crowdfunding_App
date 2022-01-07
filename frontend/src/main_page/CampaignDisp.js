@@ -31,7 +31,6 @@ function CampaignDisp() {
             } else {
               setCampaigns(response.data.allMyCampaigns);
               setVisib("hidden");
-              console.log(campaigns);
             }
           })
           .catch((error) => {
@@ -42,7 +41,7 @@ function CampaignDisp() {
           });
       }
     }
-  }, [campaigns]);
+  }, []);
 
   return (
     <div>

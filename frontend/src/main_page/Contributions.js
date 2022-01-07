@@ -35,7 +35,7 @@ const Contributions = () => {
           console.log("Done");
         });
     }
-  }, [campaigns]);
+  }, []);
 
   return (
     <div>

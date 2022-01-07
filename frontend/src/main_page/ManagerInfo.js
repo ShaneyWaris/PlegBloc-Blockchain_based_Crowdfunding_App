@@ -30,7 +30,7 @@ function ManagerInfo() {
           }
         });
     }
-  }, [user]);
+  }, []);
 
   const onViewCampaignClick = (e) => {
     e.preventDefault();
