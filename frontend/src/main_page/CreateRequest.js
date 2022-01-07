@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../auth/helper";
 import { createRequest } from "../eth_scripts/core";
+import axios from "axios";
 
 function CreateRequest() {
   const navigate = useNavigate();
@@ -9,12 +10,14 @@ function CreateRequest() {
 
   const def_obj = {
     description: "",
-    amount: 0,
+    amount: "",
     recipient: "",
   };
   const [data, setData] = useState(def_obj);
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [selectFlag, setSelectFlag] = useState(true);
+  const [vendors, setVendors] = useState([]);
 
   const InputEvent = (event) => {
     const { name, value } = event.target;
@@ -32,6 +35,26 @@ function CreateRequest() {
       window.location.reload();
     }
   }, []);
+
+  useEffect(() => {
+    axios
+      .post("http://localhost:8000/getVendors", {}, { withCredentials: true })
+      .then((response) => {
+        if (response.data.isError) {
+          console.log(response.data.message);
+        } else {
+          setVendors(response.data.vendors);
+        }
+      });
+  }, []);
+
+  const vendorChangeHandler = (e) => {
+    e.preventDefault();
+  };
+
+  const vendorDetailClick = (e) => {
+    e.preventDefault();
+  };
 
   const formSubmit = async (e) => {
     e.preventDefault();
@@ -65,10 +88,31 @@ function CreateRequest() {
         <div className="row">
           <div className="col-md-6 col-10 mx-auto">
             <form onSubmit={formSubmit}>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
-                  Recipient
-                </label>
+              <label for="exampleFormControlInput1" className="form-label">
+                Vendor
+              </label>
+              <div className="input-group mb-3">
+                <select
+                  class="form-select"
+                  aria-label="Default select example"
+                  onChange={vendorChangeHandler}
+                >
+                  <option selected={selectFlag} disabled={isFormDisabled}>
+                    Choose Vendor
+                  </option>
+                  {vendors.map((val, ind) => {
+                    return <option value={ind + 1}>val.name</option>;
+                  })}
+                </select>
+                <NavLink
+                  className="btn btn-outline-primary"
+                  id="button-addon2"
+                  to="/allcontracts"
+                  target="_blank"
+                  disabled
+                >
+                  Details &#8594;
+                </NavLink>
               </div>
               <div className="mb-3">
                 <label for="exampleFormControlInput1" className="form-label">
@@ -82,7 +126,7 @@ function CreateRequest() {
                   value={data.amount}
                   onChange={InputEvent}
                   disabled={isFormDisabled}
-                  placeholder="Wei"
+                  placeholder="Eth"
                   required
                 />
               </div>
