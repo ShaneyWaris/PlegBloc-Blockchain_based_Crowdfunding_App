@@ -25,6 +25,7 @@ import CreateRequest from "./main_page/CreateRequest";
 import ManagerInfo from "./main_page/ManagerInfo";
 import CampaignDetail from "./main_page/CampaignDetail";
 import CampaignDisp from "./main_page/CampaignDisp";
+import VendorDetails from "./main_page/VendorDetails";
 import MainNavBar from "./main_page/MainNavBar";
 
 import Footer from "./Footer";
@@ -214,6 +215,16 @@ const App = () => {
           element={
             <PrivateRoute>
               <CampaignDisp />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          end
+          path="/vendors/:address"
+          element={
+            <PrivateRoute>
+              <VendorDetails />
             </PrivateRoute>
           }
         />

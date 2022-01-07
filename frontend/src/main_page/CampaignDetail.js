@@ -293,6 +293,7 @@ const CampaignDetail = () => {
                     class="btn btn-outline-secondary"
                     type="button"
                     id="button-addon2"
+                    disabled={campaign.totalRequests === 0 ? true : false}
                     style={{ width: "100%", borderRadius: "5px" }}
                   >
                     View All Requests
