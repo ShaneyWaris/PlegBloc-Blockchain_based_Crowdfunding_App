@@ -55,15 +55,13 @@ describe("Campaigns", () => {
   });
 
   it("allows a manager to a make payment request", async () => {
-    await campaign.methods
-      .new_request("Start Website Dev", "100", accounts[1])
-      .send({
-        from: accounts[0],
-        gas: "2000000",
-      });
+    await campaign.methods.new_request("100", accounts[1]).send({
+      from: accounts[0],
+      gas: "2000000",
+    });
 
     const request = await campaign.methods.requests(0).call();
-    assert.equal("Start Website Dev", request.description);
+    assert.equal("100", request.value);
   });
 
   it("processes requests", async () => {
@@ -73,11 +71,7 @@ describe("Campaigns", () => {
     });
 
     await campaign.methods
-      .new_request(
-        "Start End Test",
-        web3.utils.toWei("5", "ether"),
-        accounts[1]
-      )
+      .new_request(web3.utils.toWei("5", "ether"), accounts[1])
       .send({
         from: accounts[0],
         gas: "2000000",

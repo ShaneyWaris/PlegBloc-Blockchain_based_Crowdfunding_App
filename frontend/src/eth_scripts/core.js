@@ -63,4 +63,106 @@ const createCampaign = async (min_amount) => {
   }
 };
 
-export { injectMetaMask, detectProvider, createCampaign };
+const makeContribution = async (amount, campaignAddress) => {
+  const provider = detectProvider();
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
+  const web3 = new Web3(provider);
+  amount = web3.utils.toWei(amount, "ether");
+
+  let campaign;
+  let accounts;
+
+  const make_contribution = async () => {
+    accounts = await web3.eth.getAccounts();
+    campaign = await new web3.eth.Contract(
+      compiledCampaign.abi,
+      campaignAddress
+    );
+
+    await campaign.methods.contribute().send({
+      value: amount,
+      from: accounts[0],
+    });
+  };
+
+  try {
+    await make_contribution();
+    return 1;
+  } catch {
+    return 0;
+  }
+};
+
+const createRequest = async (amount, receiver_addr, campaignAddress) => {
+  const provider = detectProvider();
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
+  const web3 = new Web3(provider);
+  amount = web3.utils.toWei(amount, "ether");
+
+  let campaign;
+  let accounts;
+
+  const create_request = async () => {
+    accounts = await web3.eth.getAccounts();
+    campaign = await new web3.eth.Contract(
+      compiledCampaign.abi,
+      campaignAddress
+    );
+
+    await campaign.methods.new_request(amount, receiver_addr).send({
+      from: accounts[0],
+      gas: "2000000",
+    });
+  };
+
+  try {
+    await create_request();
+    return 1;
+  } catch {
+    return 0;
+  }
+};
+
+const approveRequest = async (ind, campaignAddress) => {
+  const provider = detectProvider();
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
+  const web3 = new Web3(provider);
+
+  let campaign;
+  let accounts;
+
+  const approve_request = async () => {
+    accounts = await web3.eth.getAccounts();
+    campaign = await new web3.eth.Contract(
+      compiledCampaign.abi,
+      campaignAddress
+    );
+
+    await campaign.methods.approve_request(ind).send({
+      from: accounts[0],
+      gas: "2000000",
+    });
+  };
+
+  try {
+    await approve_request();
+    return 1;
+  } catch {
+    return 0;
+  }
+};
+
+export {
+  injectMetaMask,
+  detectProvider,
+  createCampaign,
+  makeContribution,
+  createRequest,
+  approveRequest,
+};

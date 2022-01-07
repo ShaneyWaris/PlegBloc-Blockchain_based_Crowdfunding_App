@@ -13,7 +13,6 @@ contract Campaign{
      * @dev The Request Struct has all the parameters that define a request created by campaign manager/creator
      */
     struct Request{
-        string description;
         uint value;
         address recepient;
         bool complete;
@@ -57,15 +56,13 @@ contract Campaign{
     
     /**
      * @dev create a new_request restricted to creator
-     * @param description the description telling the requirement and goals of the request
      * @param value the amount of money requested
      * @param recepient the recepient of the amount
      */
-    function new_request( string memory description, uint value, address  recepient) 
+    function new_request(uint value, address  recepient) 
     public payable restrict_to_creator {
         
         Request storage temp = requests.push();
-        temp.description = description;
         temp.value = value;
         temp.recepient = recepient;
         temp.complete = false;
