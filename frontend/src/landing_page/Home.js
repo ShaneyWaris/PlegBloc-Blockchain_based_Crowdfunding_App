@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import web from "../../src/images/home.jpg";
 import logo from "../../src/images/final-logo.png";
 import Common from "./Common";
