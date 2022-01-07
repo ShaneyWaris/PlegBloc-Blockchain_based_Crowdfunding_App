@@ -449,28 +449,30 @@ module.exports.getCampaign = (req, res) => {
           
           await campaignObj.contributedUsers.forEach((contributor) => {
             if (contributor.email == _email) {
-              your_contribution += contributor.amount;
+              your_contribution += parseFloat(contributor.amount);
             }
           });
 
           total_backers += campaignObj.contributedUsers.length;
           total_requests += campaignObj.requests.length;
-          
+
+          let campaign_obj = {
+            name: campaignObj.name,
+            description: campaignObj.description,
+            type: campaignObj.type,
+            manager: campaignObj.manager,
+            minAmount: campaignObj.minAmount,
+            targetAmount: campaignObj.targetAmount,
+            currentContribution: campaignObj.currentContribution,
+            contributedUsers: campaignObj.contributedUsers,
+            yourContribution: your_contribution,
+            totalBackers: total_backers,
+            totalRequests: total_requests
+          };
+
           return res.status(200).send({
             isError: false,
-            campaign: {
-              name: campaignObj.name,
-              description: campaignObj.description,
-              type: campaignObj.type,
-              manager: campaignObj.manager,
-              minAmount: campaignObj.minAmount,
-              targetAmount: campaignObj.targetAmount,
-              currentContribution: campaignObj.currentContribution,
-              contributedUsers: campaignObj.contributedUsers,
-              yourContribution: your_contribution,
-              totalBackers: total_backers,
-              totalRequests: total_requests
-            }
+            campaign: campaign_obj
           });
         } else {
           res.clearCookie("token");
@@ -490,7 +492,7 @@ module.exports.contribute = (req, res) => {
 
   const _campaignAddress = req.body.campaignAddress;
   const _email = req.body.email;
-  const _amount = req.body.amount;
+  const _amount = parseFloat(req.body.amount);
 
   Campaign.findOne({campaignAddress: _campaignAddress}, (err, campaign) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
@@ -501,13 +503,17 @@ module.exports.contribute = (req, res) => {
 
         if (user) {
 
+          console.log(user);
           user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
           user.totalAmountContributed += _amount;
-          await user.save();
+          await user.save().then(()=>{console.log(user)});
+          
 
+          console.log("me yaha hun");
+          console.log(campaign);
           campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
           campaign.totalAmountContributed += _amount;
-          await campaign.save();
+          await campaign.save().then(()=>{console.log(campaign)});
 
           return res.status(200).send({
             isError: false
