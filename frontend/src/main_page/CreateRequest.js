@@ -39,7 +39,7 @@ function CreateRequest() {
     setLoading(true);
 
     if (isAuthenticated()) {
-      const { campaignAddress, manager } = state;
+      const { manager, campaignAddress } = state;
       const flag = await createRequest(
         data.amount,
         data.recipient,

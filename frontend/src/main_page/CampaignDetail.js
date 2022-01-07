@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import CampInfoCard from "./CampInfoCard";
+import { makeContribution } from "../eth_scripts/core";
 
 const CampaignDetail = () => {
   const navigate = useNavigate();
@@ -92,17 +93,48 @@ const CampaignDetail = () => {
       state: {
         manager: manager,
         campaignAddress: campaignAddress,
-        campaign: campaign,
-        role: role,
       },
     });
   };
 
   const onMakeContributionClick = async (e) => {
     e.preventDefault();
-    setContriLoading(true);
+    if (isAuthenticated()) {
+      if (parseFloat(data.amount) > parseFloat(campaign.minAmount)) {
+        alert(
+          "Amount Contributed should be greater than Minimum Contribution. :/"
+        );
+      } else {
+        setContriLoading(true);
+        const contribution_flag = await makeContribution(
+          data.amount,
+          campaignAddress
+        );
+        if (contribution_flag == 1) {
+          const post_data = {
+            email: manager,
+            campaignAddress: campaignAddress,
+            amount: data.amount,
+          };
+          axios
+            .post("http://localhost:8000/contribute", post_data, {
+              withCredentials: true,
+            })
+            .then((response) => {
+              if (response.data.isError) {
+                console.log(response.data.message);
+              } else {
+                alert("Contribution Made Successfully. :)");
+                window.location.reload();
+              }
+            });
+        } else {
+          alert("Could not make the contribution. Please try again.");
+        }
+        setContriLoading(false);
+      }
+    }
   };
-
 
   const colorCode = (type) => {
     if (type === "Goverment Campaign") return "DodgerBlue";
@@ -135,8 +167,11 @@ const CampaignDetail = () => {
                   content={campaign.manager}
                   color={colorCode(campaign.type)}
                 />
-                <CampInfoCard title="Role 💻" id="2" content={role}
-                color={colorCode(campaign.type)}
+                <CampInfoCard
+                  title="Role 💻"
+                  id="2"
+                  content={role}
+                  color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
                   title="Minimum Contribution 💵"
@@ -144,7 +179,7 @@ const CampaignDetail = () => {
                   content={
                     campaign.minAmount +
                     "Eth | $" +
-                    (campaign.minAmount * usd).toFixed(4)
+                    (campaign.minAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
                 />
@@ -154,7 +189,7 @@ const CampaignDetail = () => {
                   content={
                     campaign.targetAmount +
                     "Eth | $" +
-                    (campaign.targetAmount * usd).toFixed(4)
+                    (campaign.targetAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
                 />
@@ -165,7 +200,7 @@ const CampaignDetail = () => {
                   content={
                     campaign.currentContribution +
                     "Eth | $" +
-                    (campaign.currentContribution * usd).toFixed(4)
+                    (campaign.currentContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
                 />
@@ -176,7 +211,7 @@ const CampaignDetail = () => {
                   content={
                     campaign.yourContribution +
                     "Eth | $" +
-                    (campaign.currentContribution * usd).toFixed(4)
+                    (campaign.currentContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
                 />
@@ -200,74 +235,87 @@ const CampaignDetail = () => {
           </div>
 
           <div className="col-md-5">
-              
-              <label for="exampleInputPassword1" className="form-label mt-4">
-                Contribute to this Campaign
-              </label>
-              <div className="input-group mb-5">
-                <input
-                  // type={showPass ? "text" : "password"}
-                  className="form-control"
-                  id="exampleInputPassword1"
-                  name="password"
-                  // value={data.password}
-                  // onChange={InputEvent}
-                  placeholder="Enter amount in Ether"
-                  // disabled={isFormDisabled}
-                  required
-                />
-                <span class="input-group-text" style={{marginRight:"10px"}}>
-                  $100
-                </span>
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="button-addon2"
-                  style={{borderRadius:"5px"}}
-                  // onClick={alert("hello")}
-                >
-                Submit
-                </button>
-              </div>
-
-
-              <div className="input-group mb-5">
-                <label for="exampleInputPassword1" className="form-label">
-                  To View all the Requests made by the Manager
+            {role !== "Manager" && (
+              <>
+                <label className="form-label mt-4">
+                  Contribute to this Campaign
                 </label>
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="button-addon2"
-                  style={{width:"100%", borderRadius:"5px"}}
-                >
-                View All Requests
-                </button>
-              </div>
+                <div className="input-group mb-5">
+                  <input
+                    className="form-control"
+                    name="amount"
+                    onChange={InputEvent}
+                    disabled={isContriLoading}
+                    placeholder="Enter amount in Ether"
+                    required
+                  />
+                  <span
+                    class="input-group-text"
+                    style={{ marginRight: "10px" }}
+                  >
+                    ${(data.amount * usd).toFixed(2)}
+                  </span>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                    disabled={isContriLoading}
+                    onClick={onMakeContributionClick}
+                    style={{ borderRadius: "5px" }}
+                  >
+                    <span
+                      class="spinner-grow spinner-grow-sm"
+                      role="status"
+                      style={isContriLoading ? {} : { display: "none" }}
+                      aria-hidden="true"
+                    ></span>
+                    {isContriLoading ? (
+                      <span>Contributing...</span>
+                    ) : (
+                      <span>Contribute</span>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
 
+            {(role === "Manager" || role === "Contributor") && (
+              <>
+                <div className="input-group mb-5">
+                  <label for="exampleInputPassword1" className="form-label">
+                    View all the Requests made by the Manager
+                  </label>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                    style={{ width: "100%", borderRadius: "5px" }}
+                  >
+                    View All Requests
+                  </button>
+                </div>
+              </>
+            )}
 
-
-              <div className="input-group mb-5">
-                <label for="exampleInputPassword1" className="form-label">
-                  To create a New Request (For Campaign Manager Only)  
-                </label>
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="button-addon2"
-                  style={{width:"100%", borderRadius:"5px"}}
-                >
-                Create Requests
-                </button>
-              </div>
-
+            {role === "Manager" && (
+              <>
+                <div className="input-group mb-5">
+                  <label for="exampleInputPassword1" className="form-label">
+                    Create a New Request
+                  </label>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
+                    onClick={onCreateRequestClick}
+                    style={{ width: "100%", borderRadius: "5px" }}
+                  >
+                    Create Requests
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-
-
-          
-
-
-
         </div>
       </div>
     </>

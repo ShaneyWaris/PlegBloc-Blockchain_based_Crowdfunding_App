@@ -20,6 +20,7 @@ const CreateContract = () => {
   });
 
   const [user, setUser] = useState({});
+  const [selectFlag, setSelectFlag] = useState(true);
 
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -38,6 +39,7 @@ const CreateContract = () => {
   };
 
   const typeChangeHandler = (event) => {
+    setSelectFlag(false);
     const flag = parseInt(event.target.value);
     var _type = "Others";
 
@@ -128,6 +130,7 @@ const CreateContract = () => {
           .finally(() => {
             setFormDisabled(false);
             setLoading(false);
+            setSelectFlag(true);
           });
       } else {
         setFormDisabled(false);
@@ -187,7 +190,7 @@ const CreateContract = () => {
                   aria-label="Default select example"
                   onChange={typeChangeHandler}
                 >
-                  <option selected disabled={isFormDisabled}>
+                  <option selected={selectFlag} disabled={isFormDisabled}>
                     Choose Type of Campaign
                   </option>
                   <option value="1">Goverment Campaign</option>
