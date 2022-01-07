@@ -435,7 +435,8 @@ module.exports.getCampaign = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _campaignAddress = req.body.address;
-  const _email = req.body.email;
+  const _email = req.body.email;                  // campaign manager email
+  const _userEmail = req.body.userEmail;          // current loged in user email
 
   Campaign.findOne({campaignAddress: _campaignAddress}, async (err, campaignObj) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
@@ -448,7 +449,9 @@ module.exports.getCampaign = (req, res) => {
           let your_contribution = 0, total_backers = 0, total_requests = 0;
           
           await campaignObj.contributedUsers.forEach((contributor) => {
-            if (contributor.email == _email) {
+            console.log("\n HELLO \n");
+            console.log(contributor);
+            if (contributor.email == _userEmail) {
               your_contribution += parseFloat(contributor.amount);
             }
           });
@@ -481,7 +484,7 @@ module.exports.getCampaign = (req, res) => {
         }
       });
     } else {
-      return sendErrorMessage(res, 200, "This campaign do not exist.");
+      return sendErrorMessage(res, 200, "This campaign do not exist!");
     }
   });
 }
@@ -507,13 +510,28 @@ module.exports.contribute = (req, res) => {
         if (user) {
 
           console.log("contribute-user-1: ", user.totalAmountContributed, user.myContributedCampaigns);
+          
+          
           let userFlag = 0;
-          await user.myContributedCampaigns.forEach((userContribution) => {
-            if (userContribution.campaignAddress == _campaignAddress) {
-              userContribution.amount += _amount;
+          let arr = user.myContributedCampaigns;
+          user.myContributedCampaigns = [];
+
+          for(let i = 0; i < arr.length; i++) {
+            if (arr[i].campaignAddress == _campaignAddress) {
+              console.log("wow", arr[i].amount);
+              arr[i].amount += _amount;
               userFlag = 1;
             }
-          });
+          }
+          // user.myContributedCampaigns.forEach((userContribution) => {
+          //   if (userContribution.campaignAddress == _campaignAddress) {
+          //     userContribution.amount += _amount;
+          //     userFlag = 1;
+          //   }
+          // });
+          user.myContributedCampaigns = [];
+          user.myContributedCampaigns = arr;
+
           if (userFlag == 0) {
             user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
           }
@@ -521,16 +539,35 @@ module.exports.contribute = (req, res) => {
           await user.save().then(()=>{console.log("contribute-user-2: ", user.totalAmountContributed, user.myContributedCampaigns)});
           
 
+
+
+
+
+
           console.log("\n\n");
 
           console.log("contribute-campaign-1: ", campaign.currentContribution, campaign.contributedUsers);
+          
           let campaignFlag = 0;
-          await campaign.contributedUsers.forEach((contributed_user) => {
-            if (contributed_user.email == _email) {
-              contributed_user.amount += _amount;
+          let arr1 = campaign.contributedUsers;
+          campaign.contributedUsers = [];
+
+          for(let i = 0; i < arr1.length; i++) {
+            if (arr1[i].email == _email) {
+              console.log("wow1", arr[i].email);
+              arr1[i].amount += _amount;
               campaignFlag = 1;
             }
-          });
+          }
+          // campaign.contributedUsers.forEach((contributed_user) => {
+          //   if (contributed_user.email == _email) {
+          //     contributed_user.amount += _amount;
+          //     campaignFlag = 1;
+          //   }
+          // });
+
+          campaign.contributedUsers = [];
+          campaign.contributedUsers = arr1;
           
           if (campaignFlag == 0) {
             campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
