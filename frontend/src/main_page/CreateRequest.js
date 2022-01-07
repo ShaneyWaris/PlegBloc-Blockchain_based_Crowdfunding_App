@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../auth/helper";
 import { createRequest } from "../eth_scripts/core";
@@ -26,16 +26,24 @@ function CreateRequest() {
     });
   };
 
+  useEffect(() => {
+    if (state === null) {
+      navigate("/allcontracts");
+      window.location.reload();
+    }
+  }, []);
+
   const formSubmit = async (e) => {
     e.preventDefault();
     setFormDisabled(true);
     setLoading(true);
+
     if (isAuthenticated()) {
+      const { campaignAddress, manager } = state;
       const flag = await createRequest(
-        campaignAddress,
-        data.description,
         data.amount,
-        data.recipient
+        data.recipient,
+        campaignAddress
       );
       if (flag == 1) {
         alert("Request Created Successfully. :)");
@@ -59,19 +67,8 @@ function CreateRequest() {
             <form onSubmit={formSubmit}>
               <div className="mb-3">
                 <label for="exampleFormControlInput1" className="form-label">
-                  Recipient Address
+                  Recipient
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleFormControlInput1"
-                  name="recipient"
-                  value={data.recipient}
-                  onChange={InputEvent}
-                  disabled={isFormDisabled}
-                  placeholder="Recipient's ethereum wallet address"
-                  required
-                />
               </div>
               <div className="mb-3">
                 <label for="exampleFormControlInput1" className="form-label">
