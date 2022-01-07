@@ -103,13 +103,22 @@ const CampaignDetail = () => {
     setContriLoading(true);
   };
 
+
+  const colorCode = (type) => {
+    if (type === "Goverment Campaign") return "DodgerBlue";
+    if (type === "Venture Capital Raising Campaign") return "orange";
+    if (type === "Social Cause Campaign") return "SaddleBrown";
+    if (type === "Medical Campaign") return "green";
+    return "SlateGrey";
+  };
+
   return (
     <>
-      <div className="container" style={{ marginTop: "3rem" }}>
+      <div className="container" style={{ marginTop: "1rem" }}>
         <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-          <h3 class="display-4 fw-normal">{campaign.name}</h3>
+          <h3 class="display-5 fw-normal mb-3">{campaign.name}</h3>
           {campaign.type !== "Others" && (
-            <h4 class="display-7 fw-normal">{campaign.type}</h4>
+            <h5 class="display-7 fw-normal">{campaign.type}</h5>
           )}
 
           <p class="fs-5 text-muted mt-4" style={{ textAlign: "justify" }}>
@@ -117,15 +126,18 @@ const CampaignDetail = () => {
           </p>
         </div>
         <div className="row">
-          <div className="col-md-8">
+          <div className="col-md-7">
             <main>
               <div className="row row-cols-1 row-cols-md-2 mb-3 text-center">
                 <CampInfoCard
                   title="Manager 🗿"
                   id="1"
                   content={campaign.manager}
+                  color={colorCode(campaign.type)}
                 />
-                <CampInfoCard title="Role 💻" id="2" content={role} />
+                <CampInfoCard title="Role 💻" id="2" content={role}
+                color={colorCode(campaign.type)}
+                />
                 <CampInfoCard
                   title="Minimum Contribution 💵"
                   id="3"
@@ -134,6 +146,7 @@ const CampaignDetail = () => {
                     "Eth | $" +
                     (campaign.minAmount * usd).toFixed(4)
                   }
+                  color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
                   title="Target Contribution 💰"
@@ -143,6 +156,7 @@ const CampaignDetail = () => {
                     "Eth | $" +
                     (campaign.targetAmount * usd).toFixed(4)
                   }
+                  color={colorCode(campaign.type)}
                 />
 
                 <CampInfoCard
@@ -153,6 +167,7 @@ const CampaignDetail = () => {
                     "Eth | $" +
                     (campaign.currentContribution * usd).toFixed(4)
                   }
+                  color={colorCode(campaign.type)}
                 />
 
                 <CampInfoCard
@@ -163,79 +178,96 @@ const CampaignDetail = () => {
                     "Eth | $" +
                     (campaign.currentContribution * usd).toFixed(4)
                   }
+                  color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
                   title="No. of Backers 👍"
                   id="7"
                   content={campaign.totalBackers}
+                  color={colorCode(campaign.type)}
                 />
 
                 <CampInfoCard
                   title="No. of Requests 📝"
                   id="8"
                   content={campaign.totalRequests}
+                  color={colorCode(campaign.type)}
                 />
               </div>
               <br></br>
               <br></br>
             </main>
           </div>
-          <div className="col-md-4 mb-3" style={{ textAlign: "center" }}>
-            <button
-              type="button"
-              class="btn btn-outline-primary mb-3"
-              style={{ height: "4rem", width: "14rem", fontWeight: "bold" }}
-            >
-              View Requests
-            </button>
 
-            <button
-              type="button"
-              class="btn btn-outline-primary mb-3"
-              style={{ height: "4rem", width: "14rem", fontWeight: "bold" }}
-            >
-              Create Request
-            </button>
+          <div className="col-md-5">
+              
+              <label for="exampleInputPassword1" className="form-label mt-4">
+                Contribute to this Campaign
+              </label>
+              <div className="input-group mb-5">
+                <input
+                  // type={showPass ? "text" : "password"}
+                  className="form-control"
+                  id="exampleInputPassword1"
+                  name="password"
+                  // value={data.password}
+                  // onChange={InputEvent}
+                  placeholder="Enter amount in Ether"
+                  // disabled={isFormDisabled}
+                  required
+                />
+                <span class="input-group-text" style={{marginRight:"10px"}}>
+                  $100
+                </span>
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="button-addon2"
+                  style={{borderRadius:"5px"}}
+                  // onClick={alert("hello")}
+                >
+                Submit
+                </button>
+              </div>
 
-            <div
-              class="input-group mb-3"
-              style={{ width: "14rem", textAlign: "center" }}
-            >
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Eth"
-                aria-label="Recipient's username"
-                aria-describedby="button-addon2"
-              />
-              <button
-                className="btn btn-outline-primary "
-                type="button"
-                id="button-addon2"
-                disabled={isContriLoading}
-                onClick={onMakeContributionClick}
-                style={{ fontWeight: "bold" }}
-              >
-                <span
-                  class="spinner-grow spinner-grow-sm"
-                  role="status"
-                  style={isContriLoading ? {} : { display: "none" }}
-                  aria-hidden="true"
-                ></span>
-                {isContriLoading ? (
-                  <span>Contributing...</span>
-                ) : (
-                  <span>Contribute &#8594;</span>
-                )}
-              </button>
-            </div>
-            {/* <img
-              className="mt-5"
-              src={logo}
-              alt=""
-              style={{ height: "20rem" }}
-            /> */}
+
+              <div className="input-group mb-5">
+                <label for="exampleInputPassword1" className="form-label">
+                  To View all the Requests made by the Manager
+                </label>
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="button-addon2"
+                  style={{width:"100%", borderRadius:"5px"}}
+                >
+                View All Requests
+                </button>
+              </div>
+
+
+
+              <div className="input-group mb-5">
+                <label for="exampleInputPassword1" className="form-label">
+                  To create a New Request (For Campaign Manager Only)  
+                </label>
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="button-addon2"
+                  style={{width:"100%", borderRadius:"5px"}}
+                >
+                Create Requests
+                </button>
+              </div>
+
           </div>
+
+
+          
+
+
+
         </div>
       </div>
     </>
