@@ -43,7 +43,11 @@ const CampaignDetail = () => {
       axios
         .post(
           "http://localhost:8000/getCampaign",
-          { address: campaignAddress, email: manager },
+          {
+            address: campaignAddress,
+            email: manager,
+            userEmail: getCurrentUser(),
+          },
           { withCredentials: true }
         )
         .then((response) => {
