@@ -55,7 +55,7 @@ const CampaignDetail = () => {
           }
         });
     }
-  }, [campaign]);
+  }, []);
 
   useEffect(() => {
     axios
@@ -100,7 +100,7 @@ const CampaignDetail = () => {
   const onMakeContributionClick = async (e) => {
     e.preventDefault();
     if (isAuthenticated()) {
-      if (parseFloat(data.amount) > parseFloat(campaign.minAmount)) {
+      if (parseFloat(data.amount) < parseFloat(campaign.minAmount)) {
         alert(
           "Amount Contributed should be greater than Minimum Contribution. :/"
         );
@@ -110,7 +110,7 @@ const CampaignDetail = () => {
           data.amount,
           campaignAddress
         );
-        if (contribution_flag == 1) {
+        if (contribution_flag === 1) {
           const post_data = {
             email: manager,
             campaignAddress: campaignAddress,
@@ -211,7 +211,7 @@ const CampaignDetail = () => {
                   content={
                     campaign.yourContribution +
                     "Eth | $" +
-                    (campaign.currentContribution * usd).toFixed(2)
+                    (campaign.yourContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
                 />
