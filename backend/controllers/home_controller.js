@@ -6,6 +6,7 @@ const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
 const Vendor = require("../models/vendor");
+const Request = require("../models/request");
 
 
 // This is the home page for backend.
@@ -639,6 +640,53 @@ module.exports.getVendor = (req, res) => {
     }
   });
 }
+
+
+
+
+// create a request
+module.exports.createRequest = async (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _index = req.body.index;
+  const _title = req.body.title;
+  const _description = req.body.description;
+  const _amount = parseFloat(req.body.amount);
+  const _vendorName = req.body.vendorName;
+  const _vendorAddress = req.body.vendorAddress;
+  const _campaignAddress = req.body.campaignAddress;
+
+  let request_obj = {
+    index: _index,
+    title: _title,
+    description: _description,
+    amount: _amount,
+    vendorName: _vendorName,
+    vendorAddress: _vendorAddress,
+    campaignAddress: _campaignAddress
+  };
+
+  Request.create(request_obj, async (err, request) => {
+    if (err) sendErrorMessage(res, 200, "Error while creating a new request");
+
+    Campaign.findOne({campaignAddress: _campaignAddress}, async (err, campaign) => {
+      if (err) return sendErrorMessage(res, 200, "Error while fetching a campaign from DB");
+
+      if (campaign) {
+        await campaign.requests.push(request._id);
+        await campaign.save();
+        return res.status(200).send({
+          isError: false
+        });
+      } else {
+        return sendErrorMessage(res, 200, "Campaign for which you wants to create a request do not exist.");
+      }
+      
+    });
+  });
+}
+
+
 
 
 

@@ -41,9 +41,7 @@ const campaignSchema = new mongoose.Schema({
         default: true
     },
     // Not Required Fields.
-    requests: [{                                                
-        type: Object
-    }],
+    requests : [],
     contributedUsers: [{        // [ { email: "", amount: "", Date: "" }, {}, ....., {} ] => No. of backers
         type: Object        
     }],

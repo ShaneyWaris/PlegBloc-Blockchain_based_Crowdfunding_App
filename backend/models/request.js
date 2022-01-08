@@ -2,17 +2,30 @@ const mongoose = require("mongoose");
 
 const requestSchema = new mongoose.Schema({
     // Required Fields.
+    index: {
+        type: Number,
+        required: true,
+    },
+    title: {
+        type: String,
+        required: true,
+        default: ""
+    },
     description: {
         type: String,
         required: true,
         default: ""
     },
-    value: {
+    amount: {
         type: Number,
         default: 0,
         required: true
     },
-    recepientAddress: {
+    vendorName: {
+        type: String,
+        required: true,
+    },
+    vendorAddress: {
         type: String,
         required: true,
         default: ""
@@ -27,16 +40,11 @@ const requestSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    voteCount: {
-        type: Number,
-        default: 0
-    },
-    approvers: [{
-        type: Object
-    }],
+    backers: [],            // list of unique email IDs: Its length will represent be the number of votes.
 }, {
     timestamps: true,
 });
+
 
 const Request = mongoose.model("Request", requestSchema);
 
