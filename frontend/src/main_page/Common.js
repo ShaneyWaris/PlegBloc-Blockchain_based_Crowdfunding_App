@@ -13,7 +13,6 @@ const Common = (props) => {
           <div className="col-10 mx-auto">
             <div className="row gy-4">
               {props.data.map((val, ind) => {
-                console.log(val)
                 return (
                   <Card
                     imgsrc={web}

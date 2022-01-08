@@ -93,7 +93,7 @@ function VendorDetails() {
                   disabled
                 />
                 <a
-                  href={_vendor.website}
+                  href={"https://" + _vendor.website}
                   className="btn btn-outline-primary"
                   target="_blank"
                 >

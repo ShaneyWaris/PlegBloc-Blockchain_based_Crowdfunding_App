@@ -90,8 +90,8 @@ const CampaignDetail = () => {
       state: {
         manager: manager,
         campaignAddress: campaignAddress,
-        campaign: campaign,
         role: role,
+        backers: campaign.totalBackers,
       },
     });
   };
@@ -251,7 +251,7 @@ const CampaignDetail = () => {
                   color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
-                  title="No. of Backers 👍"
+                  title="Contributors 👍"
                   id="7"
                   content={campaign.totalBackers}
                   color={colorCode(campaign.type)}
@@ -324,6 +324,7 @@ const CampaignDetail = () => {
                     class="btn btn-outline-secondary"
                     type="button"
                     id="button-addon2"
+                    onClick={onViewRequestClick}
                     disabled={campaign.totalRequests === 0 ? true : false}
                     style={{ width: "100%", borderRadius: "5px" }}
                   >
