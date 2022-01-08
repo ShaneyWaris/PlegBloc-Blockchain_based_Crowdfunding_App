@@ -112,7 +112,7 @@ function CreateRequest() {
                 if (response.data.isError) {
                   alert(response.data.message);
                 } else {
-                  alert("Request Created Successfully.");
+                  alert("Request Created Successfully. :)");
                 }
               })
               .catch((err) => {
@@ -120,7 +120,7 @@ function CreateRequest() {
                   "Some Unexpected Error Occured. Please try after some time."
                 );
               });
-            alert("Request Created Successfully. :)");
+
             setData(def_obj);
             setSelectFlag(true);
           } else {
