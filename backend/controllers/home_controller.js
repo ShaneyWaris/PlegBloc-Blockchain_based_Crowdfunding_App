@@ -704,13 +704,13 @@ module.exports.getRequests = (req, res) => {
 
 
 // approve a request (cast a vote) by a user
-module.exports.approveRequest = (req, res) => {
+module.exports.approveRequest = async (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _id = req.body.id;
   const _email = req.body.email;
 
-  Request.findOne({_id: _id}, (err, request) => {
+  Request.findOne({_id: _id}, async (err, request) => {
     if (err) return sendErrorMessage(res, 200, "Error while fetching request from DB");
 
     if (request) {
@@ -718,6 +718,9 @@ module.exports.approveRequest = (req, res) => {
       if (request.backers.indexOf(_email) > -1) {
         return sendErrorMessage(res, 200, "This user has already casted a vote for this request");
       }
+
+      await request.backers.push(_email);
+      await request.save();
       
       return res.status(200).send({
         isError: false
