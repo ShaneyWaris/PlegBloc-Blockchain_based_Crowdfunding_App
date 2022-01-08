@@ -11,12 +11,16 @@ function RequestsPage() {
   const [visib, setVisib] = useState("visible");
   const [_backers, setBackers] = useState(0);
   const [buttonFlag, setButtonFlag] = useState(0);
+  const [_campaignAddress, setCampaignAddress] = useState("");
+  const [_manager, setManager] = useState("");
 
   useEffect(() => {
     if (state === null) {
       navigate("/allcontracts");
     } else {
       const { manager, campaignAddress, role, backers } = state;
+      setCampaignAddress(campaignAddress);
+      setManager(manager);
       setBackers(parseInt(backers));
       if (role === "Manager") {
         setButtonFlag(1);
@@ -60,6 +64,8 @@ function RequestsPage() {
                     request={val}
                     buttonFlag={buttonFlag}
                     backers={_backers}
+                    campaignAddress={_campaignAddress}
+                    manager={_manager}
                   />
                 );
               })}

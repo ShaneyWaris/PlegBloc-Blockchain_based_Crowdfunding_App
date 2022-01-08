@@ -158,6 +158,17 @@ const approveRequest = async (ind, campaignAddress) => {
   }
 };
 
+const finalizeRequest = async (ind, campaignAddress) => {
+  const provider = detectProvider();
+  await provider.request({
+    method: "eth_requestAccounts",
+  });
+  const web3 = new Web3(provider);
+
+  let campaign;
+  let accounts;
+};
+
 export {
   injectMetaMask,
   detectProvider,
@@ -165,4 +176,5 @@ export {
   makeContribution,
   createRequest,
   approveRequest,
+  finalizeRequest,
 };
