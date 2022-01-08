@@ -434,9 +434,6 @@ module.exports.myContributedCampaigns = async (req, res) => {
 }
 
 
-
-
-
 // Get a campaign by providing campaignAddress and userEmail id.
 module.exports.getCampaign = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
@@ -642,8 +639,6 @@ module.exports.getVendor = (req, res) => {
 }
 
 
-
-
 // create a request
 module.exports.createRequest = async (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
@@ -704,7 +699,34 @@ module.exports.getRequests = (req, res) => {
     } else {
       return sendErrorMessage(res, 200, "Requests with this camapigns do not exist.");
     }
-  })
+  });
+}
+
+
+// approve a request (cast a vote) by a user
+module.exports.approveRequest = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _id = req.body.id;
+  const _email = req.body.email;
+
+  Request.findOne({_id: _id}, (err, request) => {
+    if (err) return sendErrorMessage(res, 200, "Error while fetching request from DB");
+
+    if (request) {
+
+      if (request.backers.indexOf(_email) > -1) {
+        return sendErrorMessage(res, 200, "This user has already casted a vote for this request");
+      }
+      
+      return res.status(200).send({
+        isError: false
+      });
+
+    } else {
+      return sendErrorMessage(res, 200, "Request with this id do not exist.");
+    }
+  });
 }
 
 

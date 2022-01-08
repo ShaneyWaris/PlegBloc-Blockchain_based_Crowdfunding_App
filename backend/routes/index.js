@@ -48,5 +48,7 @@ router.post("/getVendor", homeController.getVendor);
 // request related routes
 router.post("/createRequest", homeController.createRequest);
 router.post("/getRequests", homeController.getRequests);
+router.post("/approveRequest", homeController.approveRequest);
+
 
 module.exports = router;
