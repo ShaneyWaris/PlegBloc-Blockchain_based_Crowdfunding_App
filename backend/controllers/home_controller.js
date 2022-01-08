@@ -605,6 +605,20 @@ module.exports.vendorRegistration = (req, res) => {
 }
 
 
+// get list of all Vendors.
+module.exports.getVendors = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  
+  Vendor.find({}, (err, all_vendors) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the vendor from DB");
+
+    return res.status(200).send({
+      isError: false,
+      vendors: all_vendors
+    });
+  });
+}
+
 
 
 

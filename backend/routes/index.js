@@ -41,6 +41,7 @@ router.post("/contribute", homeController.contribute);
 
 // vendor related routes.
 router.post("/vendorRegistration", homeController.vendorRegistration);
+router.post("/getVendors", homeController.getVendors);
 
 
 module.exports = router;
