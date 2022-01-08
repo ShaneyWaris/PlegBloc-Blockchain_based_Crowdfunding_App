@@ -687,7 +687,25 @@ module.exports.createRequest = async (req, res) => {
 }
 
 
+// get Requests for a given campaign.
+module.exports.getRequests = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  
+  const _campaignAddress = req.body.campaignAddress;
 
+  Request.find({campaignAddress: _campaignAddress}, (err, requests) => {
+    if (err) return sendErrorMessage(res, 200, "Error while fetching requests from DB");
+
+    if (requests) {
+      return res.status(200).send({
+        isError: false,
+        requests: requests
+      });
+    } else {
+      return sendErrorMessage(res, 200, "Requests with this camapigns do not exist.");
+    }
+  })
+}
 
 
 
