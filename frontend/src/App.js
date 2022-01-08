@@ -231,9 +231,9 @@ const App = () => {
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      <br/>
-      <br/>
-      <br/>
+      <br />
+      <br />
+      <br />
       <Footer />
     </>
   );

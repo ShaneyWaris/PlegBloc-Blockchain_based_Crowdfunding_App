@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../auth/helper";
 import CampInfoCard from "./CampInfoCard";
 import { makeContribution } from "../eth_scripts/core";
+import Spinner from "./Spinner";
 
 const CampaignDetail = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const CampaignDetail = () => {
   const [isContriLoading, setContriLoading] = useState(false);
   const [role, setRole] = useState("dummy");
   const [campaign, setCampaign] = useState({});
+  const [visib, setVisib] = useState("visible");
 
   const [usd, setUSD] = useState(0.0);
 
@@ -97,6 +99,8 @@ const CampaignDetail = () => {
       state: {
         manager: manager,
         campaignAddress: campaignAddress,
+        numRequests: campaign.totalRequests,
+        currentContribution: campaign.currentContribution,
       },
     });
   };
@@ -150,6 +154,10 @@ const CampaignDetail = () => {
 
   return (
     <>
+      <div className="mt-4">
+        <Spinner visib={visib} />
+      </div>
+
       <div className="container" style={{ marginTop: "1rem" }}>
         <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
           <h3 class="display-6 fw-normal mb-3">{campaign.name}</h3>
@@ -178,11 +186,15 @@ const CampaignDetail = () => {
                   color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
-                  title="Minimum Contribution 💵" 
+                  title="Minimum Contribution 💵"
                   id="3"
                   content={
                     campaign.minAmount +
-                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
+                    " Eth" +
+                    "\xa0\xa0" +
+                    "/" +
+                    "\xa0\xa0" +
+                    "$" +
                     (campaign.minAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -192,7 +204,11 @@ const CampaignDetail = () => {
                   id="4"
                   content={
                     campaign.targetAmount +
-                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
+                    " Eth" +
+                    "\xa0\xa0" +
+                    "/" +
+                    "\xa0\xa0" +
+                    "$" +
                     (campaign.targetAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -203,7 +219,11 @@ const CampaignDetail = () => {
                   id="5"
                   content={
                     campaign.currentContribution +
-                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
+                    " Eth" +
+                    "\xa0\xa0" +
+                    "/" +
+                    "\xa0\xa0" +
+                    "$" +
                     (campaign.currentContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -214,7 +234,11 @@ const CampaignDetail = () => {
                   id="6"
                   content={
                     campaign.yourContribution +
-                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
+                    " Eth" +
+                    "\xa0\xa0" +
+                    "/" +
+                    "\xa0\xa0" +
+                    "$" +
                     (campaign.yourContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -323,7 +347,6 @@ const CampaignDetail = () => {
           </div>
         </div>
       </div>
-      
     </>
   );
 };

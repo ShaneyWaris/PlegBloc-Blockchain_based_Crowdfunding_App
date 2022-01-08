@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getCurrentUser } from "../auth/helper";
 import axios from "axios";
 
 function VendorRegistration() {
@@ -6,9 +7,10 @@ function VendorRegistration() {
     name: "",
     email: "",
     website: "",
+    phone: "",
     description: "",
     address: "",
-    isVerified: false,
+    manager: "",
   });
 
   const def_obj = {
@@ -18,7 +20,7 @@ function VendorRegistration() {
     phone: "",
     description: "",
     address: "",
-    isVerified: false,
+    manager: "",
   };
 
   const [isFormDisabled, setFormDisabled] = useState(false);
@@ -38,6 +40,7 @@ function VendorRegistration() {
     e.preventDefault();
     setLoading(true);
     setFormDisabled(true);
+    data.manager = getCurrentUser();
 
     axios
       .post("http://localhost:8000/vendorRegistration", data, {
@@ -47,7 +50,7 @@ function VendorRegistration() {
         if (response.data.isError) {
           alert(response.data.message);
         } else {
-          alert("Vendor Registered Successfully");
+          alert("Vendor Registered Successfully. :)");
           setData(def_obj);
         }
       })
@@ -117,11 +120,11 @@ function VendorRegistration() {
                   type="text"
                   className="form-control"
                   id="exampleFormControlInput1"
-                  name="name"
+                  name="website"
                   value={data.website}
                   onChange={InputEvent}
                   disabled={isFormDisabled}
-                  placeholder="Enter the Vendor's Website"
+                  placeholder="Enter the Vendor's Website e.g. Amazon Profile, Personal Website etc."
                   required
                 />
               </div>
@@ -199,10 +202,10 @@ function VendorRegistration() {
           </div>
         </div>
       </div>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
+      <br />
+      <br />
+      <br />
+      <br />
     </>
   );
 }

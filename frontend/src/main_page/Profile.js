@@ -10,13 +10,23 @@ const Profile = () => {
     email: "",
     phone: "",
     factory_address: "",
+    amount: "",
   });
 
   const [isFormDisabled, setFormDisabled] = useState(false);
   const [isUpdateLoading, setUpdateLoading] = useState(false);
   const [isLogoutLoading, setLogoutLoading] = useState(false);
   const [user, setUser] = useState({});
+  const [usd, setUSD] = useState(0.0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD")
+      .then((response) => {
+        setUSD(response.data.USD);
+      });
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -38,6 +48,7 @@ const Profile = () => {
               phone: user.phone,
               email: user.email,
               factory_address: user.myCampaignFactoryAddress,
+              amount: user.totalAmountContributed,
             };
             setData(temp_data);
           }
@@ -160,7 +171,7 @@ const Profile = () => {
                 />
               </div>
               <label for="exampleFormControlInput1" className="form-label">
-                  Phone
+                Phone
               </label>
               <div className="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">
@@ -191,13 +202,30 @@ const Profile = () => {
                   placeholder="name@example.com"
                   disabled
                 />
-                <div className="invalid-feedback">
-                  Please provide a valid Email Address.
-                </div>
+              </div>
+              <label for="exampleFormControlInput1" className="form-label">
+                Total Amount Contributed
+              </label>
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="exampleFormControlInput1"
+                  name="amount"
+                  value={data.amount + " Eth"}
+                  placeholder="Eth"
+                  disabled
+                  required
+                />
+                <span class="input-group-text">
+                  $
+                  {data.amount === ""
+                    ? 0.0
+                    : (parseFloat(data.amount) * usd).toFixed(4)}
+                </span>
               </div>
 
               <div className="col-md-12">
-                
                 <button
                   className="btn btn-outline-primary"
                   type="submit"
@@ -221,7 +249,7 @@ const Profile = () => {
                   type="submit"
                   id="logout"
                   disabled={isFormDisabled}
-                  style={{float:"right"}}
+                  style={{ float: "right" }}
                 >
                   <span
                     class="spinner-grow spinner-grow-sm"

@@ -39,6 +39,7 @@ const CreateContract = () => {
   };
 
   const typeChangeHandler = (event) => {
+    event.preventDefault();
     setSelectFlag(false);
     const flag = parseInt(event.target.value);
     var _type = "Others";
@@ -146,7 +147,6 @@ const CreateContract = () => {
       </div>
       <div className="container contact_div">
         <div className="row">
-
           <div className="col-md-6 col-10 mx-auto">
             <form onSubmit={formSubmit}>
               <div className="mb-3">
@@ -190,6 +190,7 @@ const CreateContract = () => {
                   class="form-select"
                   aria-label="Default select example"
                   onChange={typeChangeHandler}
+                  disabled={isFormDisabled}
                 >
                   <option selected={selectFlag} disabled={isFormDisabled}>
                     Choose Type of Campaign
@@ -220,7 +221,7 @@ const CreateContract = () => {
                   $
                   {data.min_amount === ""
                     ? 0.0
-                    : (parseFloat(data.min_amount) * usd).toFixed(5)}
+                    : (parseFloat(data.min_amount) * usd).toFixed(4)}
                 </span>
               </div>
               <label for="exampleFormControlInput1" className="form-label">
@@ -251,7 +252,6 @@ const CreateContract = () => {
                   className="btn btn-outline-primary"
                   type="submit"
                   disabled={isFormDisabled}
-                  // style={{width:"50%"}}
                 >
                   <span
                     class="spinner-grow spinner-grow-sm"
@@ -265,11 +265,11 @@ const CreateContract = () => {
                     <span>Create Campaign</span>
                   )}
                 </button>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
               </div>
             </form>
           </div>
