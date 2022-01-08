@@ -13,15 +13,16 @@ const Common = (props) => {
           <div className="col-10 mx-auto">
             <div className="row gy-4">
               {props.data.map((val, ind) => {
+                console.log(val)
                 return (
                   <Card
                     imgsrc={web}
                     title={val.name}
                     des={val.description}
                     campaignAddress={val.campaignAddress}
-                    contractFactoryAddress={val.contractFactoryAddress}
                     manager={val.manager}
                     campaign={val}
+                    type={val.type}
                   />
                 );
               })}

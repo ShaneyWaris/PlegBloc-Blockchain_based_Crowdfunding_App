@@ -409,18 +409,20 @@ module.exports.myCampaigns = (req, res) =>{
 
 
 // get all the campaigns where user has contributed some amount.
-module.exports.myContributedCampaigns = (req, res) => {
+module.exports.myContributedCampaigns = async (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _email = req.body.email;
 
-  User.findOne({email: _email}, (err, user) => {
+  User.findOne({email: _email}, async (err, user) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding the user from the DB.");
 
     if (user) {
-      return res.status(200).send({
-        isError: false,
-        myContributedCampaigns: user.myContributedCampaigns,
+      await get_campaigns_list(user.myContributedCampaigns).then(async (userContributedCampaigns) => {
+        return res.status(200).send({
+          isError: false,
+          myContributedCampaigns: userContributedCampaigns,
+        });
       });
     } else {
       res.clearCookie("token");
@@ -430,13 +432,16 @@ module.exports.myContributedCampaigns = (req, res) => {
 }
 
 
+
+
+
 // Get a campaign by providing campaignAddress and userEmail id.
 module.exports.getCampaign = (req, res) => {
   if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
 
   const _campaignAddress = req.body.address;
   const _email = req.body.email;                  // campaign manager email
-  const _userEmail = req.body.userEmail;          // current loged in user email
+  const _userEmail = req.body.userEmail;          // current logged-in user email
 
   Campaign.findOne({campaignAddress: _campaignAddress}, async (err, campaignObj) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
@@ -449,8 +454,6 @@ module.exports.getCampaign = (req, res) => {
           let your_contribution = 0, total_backers = 0, total_requests = 0;
           
           await campaignObj.contributedUsers.forEach((contributor) => {
-            console.log("\n HELLO \n");
-            console.log(contributor);
             if (contributor.email == _userEmail) {
               your_contribution += parseFloat(contributor.amount);
             }
@@ -472,12 +475,12 @@ module.exports.getCampaign = (req, res) => {
             totalBackers: total_backers,
             totalRequests: total_requests
           };
-          console.log("\n getCampaign(): ", campaign_obj);
 
           return res.status(200).send({
             isError: false,
             campaign: campaign_obj
           });
+
         } else {
           res.clearCookie("token");
           return sendErrorMessage(res, 200, "User with email ID provided by you do not exist.");
@@ -498,8 +501,6 @@ module.exports.contribute = (req, res) => {
   const _email = req.body.email;
   const _amount = parseFloat(req.body.amount);
 
-  console.log("\n contribute-request", _email, _amount);
-
   Campaign.findOne({campaignAddress: _campaignAddress}, (err, campaign) => {
     if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
 
@@ -508,72 +509,42 @@ module.exports.contribute = (req, res) => {
         if (err) return sendErrorMessage(res, 200, "Error while finding the user from DB.");
 
         if (user) {
-
-          console.log("contribute-user-1: ", user.totalAmountContributed, user.myContributedCampaigns);
-          
-          
-          let userFlag = 0;
-          let arr = user.myContributedCampaigns;
+          // update user details.
+          let forUser_hasUserAlreadyContributedToThisCampaign = false;
+          let updated_myContributedCampaigns = user.myContributedCampaigns;   // [{ campaignAddress: "", amount: "", Date: "" }, ... ]
           user.myContributedCampaigns = [];
 
-          for(let i = 0; i < arr.length; i++) {
-            if (arr[i].campaignAddress == _campaignAddress) {
-              console.log("wow", arr[i].amount);
-              arr[i].amount += _amount;
-              userFlag = 1;
+          for(let i = 0; i < updated_myContributedCampaigns.length; i++) {
+            if (updated_myContributedCampaigns[i].campaignAddress == _campaignAddress) {
+              updated_myContributedCampaigns[i].amount += _amount;
+              forUser_hasUserAlreadyContributedToThisCampaign = true;
             }
           }
-          // user.myContributedCampaigns.forEach((userContribution) => {
-          //   if (userContribution.campaignAddress == _campaignAddress) {
-          //     userContribution.amount += _amount;
-          //     userFlag = 1;
-          //   }
-          // });
-          user.myContributedCampaigns = [];
-          user.myContributedCampaigns = arr;
-
-          if (userFlag == 0) {
+          user.myContributedCampaigns = updated_myContributedCampaigns;
+          if (forUser_hasUserAlreadyContributedToThisCampaign == false) {
             user.myContributedCampaigns.push({ campaignAddress: _campaignAddress, amount: _amount, Date: Date() });
           }
           user.totalAmountContributed += _amount;
-          await user.save().then(()=>{console.log("contribute-user-2: ", user.totalAmountContributed, user.myContributedCampaigns)});
+          await user.save();
           
 
-
-
-
-
-
-          console.log("\n\n");
-
-          console.log("contribute-campaign-1: ", campaign.currentContribution, campaign.contributedUsers);
-          
-          let campaignFlag = 0;
-          let arr1 = campaign.contributedUsers;
+          // update campaign details. 
+          let forCampaign_hasUserAlreadyContributedToThisCampaign = false;
+          let updated_contributedUsers = campaign.contributedUsers;
           campaign.contributedUsers = [];
-
-          for(let i = 0; i < arr1.length; i++) {
-            if (arr1[i].email == _email) {
-              console.log("wow1", arr[i].email);
-              arr1[i].amount += _amount;
-              campaignFlag = 1;
+          
+          for(let i = 0; i < updated_contributedUsers.length; i++) {
+            if (updated_contributedUsers[i].email == _email) {
+              updated_contributedUsers[i].amount += _amount;
+              forCampaign_hasUserAlreadyContributedToThisCampaign = true;
             }
           }
-          // campaign.contributedUsers.forEach((contributed_user) => {
-          //   if (contributed_user.email == _email) {
-          //     contributed_user.amount += _amount;
-          //     campaignFlag = 1;
-          //   }
-          // });
-
-          campaign.contributedUsers = [];
-          campaign.contributedUsers = arr1;
-          
-          if (campaignFlag == 0) {
+          campaign.contributedUsers = updated_contributedUsers;
+          if (forCampaign_hasUserAlreadyContributedToThisCampaign == false) {
             campaign.contributedUsers.push({ email: _email, amount: _amount, Date: Date() });
           }
           campaign.currentContribution += _amount;
-          await campaign.save().then(()=>{console.log("contribute-campaign-2: ", campaign.currentContribution, campaign.contributedUsers);});
+          await campaign.save();
 
           return res.status(200).send({
             isError: false
@@ -588,4 +559,31 @@ module.exports.contribute = (req, res) => {
       return sendErrorMessage(res, 200, "Campaign where you want to contribute do not exist.");
     }
   }); 
+}
+
+
+
+
+
+
+
+// ------------------ FUNCTIONS -------------------------
+async function get_campaigns_list(myContributedCampaigns) {
+  let userContributedCampaigns = [];
+  for (let i = 0; i < myContributedCampaigns.length; i++) {
+    await Campaign.findOne({campaignAddress: myContributedCampaigns[i].campaignAddress}, async (err, campaign) => {
+      if (err) return sendErrorMessage(res, 200, "Error in finding a campaign from the DB.");
+
+      if (campaign) {
+        userContributedCampaigns.push({
+            name: campaign.name,
+            description: campaign.description,
+            campaignAddress: campaign.campaignAddress,
+            manager: campaign.manager,
+            type: campaign.type
+        });
+      }
+    });
+  }
+  return userContributedCampaigns;
 }

@@ -19,7 +19,7 @@ function CampInfoCard(props) {
       <div className="col" onClick={onCardClick} >
         <div className="card mb-4 rounded-3 shadow-md">
           <div className="card-header py-1 text-white" style={{backgroundColor:props.color, borderColor:props.color}}>
-            <h5 className="my-0 fw-normal">{props.title}</h5>
+            <h6 className="my-0 py-1 fw-normal">{props.title}</h6>
           </div>
           <div className="card-body py-2">
             <b style={{ textAlign: "center" }}>{props.content}</b>

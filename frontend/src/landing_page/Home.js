@@ -90,51 +90,49 @@ const Home = () => {
           <br></br>
         </main>
 
-        <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="p-3 mb-4 bg-light rounded-3">
           <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">Why PlegBloc?</h1>
-            <table>
-              <tr>
-                <td>
-                  <p
-                    class="col-md-12 fs-4"
-                    style={{ textAlign: "justify", marginTop: "2rem" }}
-                  >
-                    <ul>
+            <h1 class="display-7 fw-bold">Why PlegBloc?</h1> <br/>
+
+            <div class="container">
+              <div class="row" style={{textAlign:"justify"}}>
+                <div class="col-sm-8">
+                  <ul>
                       <li>
                         PlegBloc upholds the principle of trustful crowdfunding
                         by enabling the investors to decide the place where the
                         capital can be spent.
                       </li>
+                      <br/>
                       <li>
                         To use the capital, a venture has to request a vote from
                         all the investors by providing all the details about the
                         expenses. The investors can then verify the credibility
                         of this expense and then post their vote accordingly.
-                      </li>
+                      </li> <br/>
                       <li>
                         For the venture to execute the expense it must have a
                         positive vote from the majority of the investors.
-                      </li>
+                      </li> <br/>
                       <li>
                         In this way, the capital of the investors is safe and
                         they are aware of all the expense details as the venture
                         is required to furnish them for holding a vote.
-                      </li>
+                      </li> <br/>
                       <li>
                         Thus investors have transparency and control over their
                         funds. The currency of exchange on PlegBloc is Ether.
                       </li>
                     </ul>
-                  </p>
-                </td>
-                <td className="col-md-4 " style={{ textAlign: "center" }}>
-                  <div style={{ textAlign: "center" }}>
+                </div>
+                
+                <div class="col-sm-4">
+                <div style={{ textAlign: "center" }}>
                     <img src={logo} alt="" style={{ height: "20rem" }} />
                   </div>
-                </td>
-              </tr>
-            </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

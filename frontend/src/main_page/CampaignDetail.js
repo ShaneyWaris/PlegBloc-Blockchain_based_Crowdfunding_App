@@ -152,7 +152,7 @@ const CampaignDetail = () => {
     <>
       <div className="container" style={{ marginTop: "1rem" }}>
         <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-          <h3 class="display-5 fw-normal mb-3">{campaign.name}</h3>
+          <h3 class="display-6 fw-normal mb-3">{campaign.name}</h3>
           {campaign.type !== "Others" && (
             <h5 class="display-7 fw-normal">{campaign.type}</h5>
           )}
@@ -166,23 +166,23 @@ const CampaignDetail = () => {
             <main>
               <div className="row row-cols-1 row-cols-md-2 mb-3 text-center">
                 <CampInfoCard
-                  title="Manager 🗿"
+                  title="Manager 👨‍💼"
                   id="1"
                   content={campaign.manager}
                   color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
-                  title="Role 💻"
+                  title="Your Role 💻"
                   id="2"
                   content={role}
                   color={colorCode(campaign.type)}
                 />
                 <CampInfoCard
-                  title="Minimum Contribution 💵"
+                  title="Minimum Contribution 💵" 
                   id="3"
                   content={
                     campaign.minAmount +
-                    "Eth | $" +
+                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
                     (campaign.minAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -192,7 +192,7 @@ const CampaignDetail = () => {
                   id="4"
                   content={
                     campaign.targetAmount +
-                    "Eth | $" +
+                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
                     (campaign.targetAmount * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -203,7 +203,7 @@ const CampaignDetail = () => {
                   id="5"
                   content={
                     campaign.currentContribution +
-                    "Eth | $" +
+                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
                     (campaign.currentContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -214,7 +214,7 @@ const CampaignDetail = () => {
                   id="6"
                   content={
                     campaign.yourContribution +
-                    "Eth | $" +
+                    " Eth" + "\xa0\xa0" + "/" + "\xa0\xa0" + "$" +
                     (campaign.yourContribution * usd).toFixed(2)
                   }
                   color={colorCode(campaign.type)}
@@ -323,6 +323,7 @@ const CampaignDetail = () => {
           </div>
         </div>
       </div>
+      
     </>
   );
 };

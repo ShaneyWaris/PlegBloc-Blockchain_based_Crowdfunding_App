@@ -125,7 +125,7 @@ const Contact = () => {
                   required
                 ></textarea>
               </div>
-              <div className="col-12">
+              <div className="col-12 text-center">
                 <button
                   className="btn btn-outline-primary"
                   type="submit"

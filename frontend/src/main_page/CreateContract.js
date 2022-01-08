@@ -146,6 +146,7 @@ const CreateContract = () => {
       </div>
       <div className="container contact_div">
         <div className="row">
+
           <div className="col-md-6 col-10 mx-auto">
             <form onSubmit={formSubmit}>
               <div className="mb-3">
@@ -244,11 +245,13 @@ const CreateContract = () => {
                     : (parseFloat(data.target_amount) * usd).toFixed(5)}
                 </span>
               </div>
-              <div className="col-12">
+
+              <div className="text-center">
                 <button
                   className="btn btn-outline-primary"
                   type="submit"
                   disabled={isFormDisabled}
+                  // style={{width:"50%"}}
                 >
                   <span
                     class="spinner-grow spinner-grow-sm"
@@ -262,6 +265,11 @@ const CreateContract = () => {
                     <span>Create Campaign</span>
                   )}
                 </button>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
               </div>
             </form>
           </div>

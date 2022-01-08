@@ -218,7 +218,7 @@ const Register = () => {
                   &#x2718; Password and Confirm Password do not match.
                 </div>
               )}
-              <div className="col-12 mt-4">
+              <div className="col-12 mt-4 text-center">
                 <button
                   className="btn btn-outline-primary mb-5"
                   type="submit"
@@ -241,6 +241,14 @@ const Register = () => {
           </div>
         </div>
       </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
     </>
   );
 };

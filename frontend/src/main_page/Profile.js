@@ -159,10 +159,13 @@ const Profile = () => {
                   disabled={isFormDisabled}
                 />
               </div>
-              <div className="mb-3">
-                <label for="exampleFormControlInput1" className="form-label">
+              <label for="exampleFormControlInput1" className="form-label">
                   Phone
-                </label>
+              </label>
+              <div className="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                  +91
+                </span>
                 <input
                   type="text"
                   className="form-control"
@@ -193,7 +196,8 @@ const Profile = () => {
                 </div>
               </div>
 
-              <div className="col-12">
+              <div className="col-md-12">
+                
                 <button
                   className="btn btn-outline-primary"
                   type="submit"
@@ -213,10 +217,11 @@ const Profile = () => {
                   )}
                 </button>
                 <button
-                  className="btn btn-outline-primary ms-3"
+                  className="btn btn-outline-primary"
                   type="submit"
                   id="logout"
                   disabled={isFormDisabled}
+                  style={{float:"right"}}
                 >
                   <span
                     class="spinner-grow spinner-grow-sm"

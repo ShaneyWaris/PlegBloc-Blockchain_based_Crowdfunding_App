@@ -176,7 +176,7 @@ function VendorRegistration() {
                   required
                 />
               </div>
-              <div className="col-12 mb-5">
+              <div className="text-center">
                 <button
                   className="btn btn-outline-primary"
                   type="submit"
@@ -199,6 +199,10 @@ function VendorRegistration() {
           </div>
         </div>
       </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
     </>
   );
 }

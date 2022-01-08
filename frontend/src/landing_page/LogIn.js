@@ -142,7 +142,7 @@ const LogIn = () => {
                   />
                 </button>
               </div>
-              <div className="col-12">
+              <div className="col-md-12 mt-4">
                 <button
                   className="btn btn-outline-primary"
                   type="submit"
@@ -162,6 +162,7 @@ const LogIn = () => {
                   name="forgot_pass"
                   disabled={isFormDisabled}
                   onClick={onForgotPassClick}
+                  style={{float:"right"}}
                 >
                   Forgot Password?
                 </button>
