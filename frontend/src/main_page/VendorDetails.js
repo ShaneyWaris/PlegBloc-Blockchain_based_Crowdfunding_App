@@ -37,6 +37,13 @@ function VendorDetails() {
       });
   }, []);
 
+
+  const getWebsite = (vendorWebsite) => {
+    if (vendorWebsite.indexOf("https://") > -1) return _vendor.website;
+    return "https://"+vendorWebsite;
+  }
+
+
   return (
     <>
       <div className="my-5">
@@ -93,7 +100,7 @@ function VendorDetails() {
                   disabled
                 />
                 <a
-                  href={"https://" + _vendor.website}
+                  href={getWebsite(_vendor.website)}
                   className="btn btn-outline-primary"
                   target="_blank"
                 >
