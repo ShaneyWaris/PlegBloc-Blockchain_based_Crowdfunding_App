@@ -15,6 +15,7 @@ const CampaignDetail = () => {
   const [role, setRole] = useState("dummy");
   const [campaign, setCampaign] = useState({});
   const [visib, setVisib] = useState("visible");
+  const [inVisib, setInVisib] = useState("hidden");
 
   const [usd, setUSD] = useState(0.0);
 
@@ -58,6 +59,8 @@ const CampaignDetail = () => {
           } else {
             role_adjustment(response.data.campaign);
             setCampaign(response.data.campaign);
+            setVisib("hidden");
+            setInVisib("visible");
           }
         });
     }
@@ -154,11 +157,15 @@ const CampaignDetail = () => {
 
   return (
     <>
-      <div className="mt-4">
-        <Spinner visib={visib} />
-      </div>
-
-      <div className="container" style={{ marginTop: "1rem" }}>
+      {visib === "visible" && (
+        <div style={{ marginTop: "10rem" }}>
+          <Spinner visib={visib} />
+        </div>
+      )}
+      <div
+        className="container"
+        style={{ marginTop: "1rem", visibility: inVisib }}
+      >
         <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
           <h3 class="display-6 fw-normal mb-3">{campaign.name}</h3>
           {campaign.type !== "Others" && (
