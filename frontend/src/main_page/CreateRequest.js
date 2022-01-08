@@ -105,11 +105,9 @@ function CreateRequest() {
               campaignAddress: campaignAddress,
             };
             axios
-              .post(
-                "http://localhost:8000/createRequest",
-                { _data },
-                { withCredentials: true }
-              )
+              .post("http://localhost:8000/createRequest", _data, {
+                withCredentials: true,
+              })
               .then((response) => {
                 if (response.data.isError) {
                   alert(response.data.message);
