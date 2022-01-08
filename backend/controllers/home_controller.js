@@ -620,6 +620,25 @@ module.exports.getVendors = (req, res) => {
 }
 
 
+// getVendor()
+module.exports.getVendor = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _address = req.body.address;
+
+  Vendor.findOne({address: _address}, (err, vendor) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the vendor from DB");
+
+    if (vendor) {
+      return res.status(200).send({
+        isError: false,
+        vendor: vendor
+      });
+    } else {
+      return sendErrorMessage(res, 200, "This vendor do not exist.");
+    }
+  });
+}
 
 
 
