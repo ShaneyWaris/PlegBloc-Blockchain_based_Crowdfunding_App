@@ -39,4 +39,8 @@ router.post("/myContributedCampaigns", homeController.myContributedCampaigns);
 router.post("/contribute", homeController.contribute);
 
 
+// vendor related routes.
+router.post("/vendorRegistration", homeController.vendorRegistration);
+
+
 module.exports = router;

@@ -5,6 +5,7 @@ const {genOtp, verifyOtp, encrypt, decrypt} = require('./../config/otp');
 const { generateToken } = require("../config/jwt");
 const User = require("../models/user");
 const Campaign = require("../models/campaign");
+const Vendor = require("../models/vendor");
 
 
 // This is the home page for backend.
@@ -562,6 +563,49 @@ module.exports.contribute = (req, res) => {
 }
 
 
+// vendor registration
+module.exports.vendorRegistration = (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+  
+  const _name = req.body.name;
+  const _email = req.body.email;
+  const _website = req.body.website;
+  const _phone = req.body.phone;
+  const _description = req.body.description;
+  const _isVerified = req.body.isVerified;
+  const _address = req.body.address;
+  const _manager = req.body.manager;
+
+  Vendor.findOne({address: _address}, (err, vendor) => {
+    if (err) return sendErrorMessage(res, 200, "Error while finding the vendor from DB");
+
+    if (!vendor) {
+      let vendor_obj = {
+        name: _name,
+        email: _email,
+        website: _website,
+        phone: _phone,
+        description: _description,
+        isVerified: _isVerified,
+        address: _address,
+        manager: _manager
+      };
+
+      Vendor.create(vendor_obj, (err, vendor) => {
+        if (err) return sendErrorMessage(res, 200, "Unable to regsiter a vendor.");
+
+        return res.status(200).send({
+          isError: false
+        });
+      });
+    } else {
+      return sendErrorMessage(res, 200, "This vendor is already exist.")
+    }
+  });
+}
+
+
+
 
 
 
@@ -587,3 +631,5 @@ async function get_campaigns_list(myContributedCampaigns) {
   }
   return userContributedCampaigns;
 }
+
+
