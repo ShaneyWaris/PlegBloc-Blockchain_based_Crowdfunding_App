@@ -10,7 +10,7 @@ function RequestsPage() {
   const [requests, setRequests] = useState([]);
   const [visib, setVisib] = useState("visible");
   const [_backers, setBackers] = useState(0);
-  const [buttonFlag, setButtonFlag] = useState(0);
+  const [_role, setRole] = useState("");
   const [_campaignAddress, setCampaignAddress] = useState("");
   const [_manager, setManager] = useState("");
 
@@ -22,9 +22,7 @@ function RequestsPage() {
       setCampaignAddress(campaignAddress);
       setManager(manager);
       setBackers(parseInt(backers));
-      if (role === "Manager") {
-        setButtonFlag(1);
-      }
+      setRole(role);
       axios
         .post(
           "http://localhost:8000/getRequests",
@@ -54,7 +52,7 @@ function RequestsPage() {
         <h1 className="text-center">All Requests</h1>
       </div>
       <Spinner visib={visib} />
-      <div className="container-fluid mb-5">
+      <div className="container-fluid mb-3">
         <div className="row">
           <div className="col-10 mx-auto">
             <div className="row gy-4">
@@ -62,7 +60,7 @@ function RequestsPage() {
                 return (
                   <Request_Card
                     request={val}
-                    buttonFlag={buttonFlag}
+                    role={_role}
                     backers={_backers}
                     campaignAddress={_campaignAddress}
                     manager={_manager}

@@ -1,133 +1,127 @@
 import React, { useState, useEffect } from "react";
 import { getCurrentUser } from "../auth/helper";
-import { approveRequest } from "../eth_scripts/core";
+import { approveRequest, finalizeRequest } from "../eth_scripts/core";
+import web from "../../src/images/img2.svg";
 import axios from "axios";
 
 function Request_Card(props) {
   const [disableFlag, setDisableFlag] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [url, setUrl] = useState(
     "http://localhost:3000/vendors/" + props.request.vendorAddress
   );
 
-  const [voteFlag, setVoteFlag] = useState(0);
-  useEffect(() => {
-    if (props.buttonFlag === 0) {
-      const email = getCurrentUser();
-      for (let i = 0; i < props.request.backers; i++) {
-        if (email === props.request.backers[i]) {
-          console.log(props.request.backers[i]);
-          setVoteFlag(1);
-        }
-      }
-    }
-  }, []);
-
-  const onButtonClick = async (e) => {
+  const approveVoteClick = async (e) => {
     e.preventDefault();
-    setDisableFlag(true);
-    if (props.buttonFlag === 0) {
-      axios
-        .post(
-          "http://localhost:8000/approveRequest",
-          { id: props.request._id, email: getCurrentUser() },
-          { withCredentials: true }
-        )
-        .then((response) => {
-          if (response.data.isError) {
-            console.log(response.data.message);
-          } else {
-            approveRequest(props.request.index, props.campaignAddress).then(
-              (approve_request_flag) => {
-                if (approve_request_flag === 1) {
-                  alert("Request Approved Successfully");
-                  window.location.reload(true);
-                } else {
-                  alert("Some error occurred. Try again later.");
-                }
-              }
-            );
-          }
-        })
-        .catch((err) => {
-          alert("Some error occurred. Try again later.");
-        });
-    } else {
-      if (props.request.backers.length <= parseInt(props.backers) / 2) {
-        alert("You need a majority vote to finalize the request.");
-      } else {
-      }
-    }
-    setDisableFlag(false);
   };
+
+  const finalizeClick = async (e) => {
+    e.preventDefault();
+  };
+
   return (
     <>
       <div
-        className="our_solution_category"
-        disabled={props.request.isComplete || disableFlag}
+        class="card ms-5 mb-5 border-primary"
+        style={{ maxWidth: 540 + "px", margin: 0 + "px", padding: 0 + "px" }}
+        disabled={props.request.isComplete}
       >
-        <div className="solution_cards_box">
-          <div
-            className="solution_card"
-            style={
-              props.request.isComplete
-                ? { background: "#1A3514" }
-                : { background: "#2A3544" }
-            }
-          >
-            <div className="solu_title text-center">
-              <h6 style={{ color: "whitesmoke" }}>
-                Request #{props.request.index}{" "}
-                {props.request.isComplete ? " (Completed)" : ""}
-              </h6>
-            </div>
-            <div className="solu_title">
-              <h5 style={{ color: "whitesmoke" }}>
-                <b>
-                  <u>{props.request.title}</u>
-                </b>
+        {props.complete === "complete" && (
+          <div className="card-header alert-danger">
+            Request #{props.request.index} {" (Complete)"}
+          </div>
+        )}
+        {!props.request.isComplete && (
+          <div className="card-header alert-success">
+            Request #{props.request.index}
+          </div>
+        )}
+        <div class="row g-0">
+          <div>
+            <div class="card-body">
+              <h5 class="card-text">
+                <u>{props.request.title}</u>
               </h5>
-            </div>
-            <div
-              className="solu_description"
-              style={{ color: "whitesmoke", textAlign: "justify" }}
-            >
-              <p className="mb-2">
-                <b>Description</b> : {props.request.description}
+              <p class="card-text">
+                <small class="text-muted">
+                  <b>Description : </b> {props.request.description}
+                </small>
+                <br />
+                <small class="text-muted">
+                  <b>Campaign Contributors : </b>
+                  {props.backers}
+                </small>
+                <br />
+                <small class="text-muted">
+                  <b>No. of Votes : </b>
+                  {props.request.backers.length}
+                </small>
+                <br />
+                <small class="text-muted">
+                  <b>Amount Requested : </b>
+                  {props.request.amount} Eth
+                </small>
+
+                <small class="text-muted" style={{ float: "right" }}>
+                  <b>
+                    <a
+                      href={url}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      Vendor Details &#8599;
+                    </a>
+                  </b>
+                </small>
               </p>
-              <p className="mb-2">
-                <b>Campaign Contributors</b> : {props.backers}
-              </p>
-              <p className="mb-2">
-                <b>Number of Votes</b> : {props.request.backers.length}
-              </p>
-              <p className="mb-2">
-                <b>Amount Requested</b> : {props.request.amount} Eth
-              </p>
-              <p className="mb-3">
-                <b>Vendor</b> : {props.request.vendorName} &nbsp;{" "}
-                <a
-                  style={{ float: "right", color: "white" }}
-                  href={url}
-                  target="_blank"
-                >
-                  <u>Vendor Details</u>&#8594;
-                </a>
-              </p>
-              <button
-                type="button"
-                className="read_more_btn"
-                onClick={onButtonClick}
-                style={{ backgroundColor: "SlateGrey" }}
-                disabled={voteFlag === 0 ? false : true}
-              >
-                {props.buttonFlag === 0 &&
-                  !props.request.isComplete &&
-                  (voteFlag === 0 ? "Approve Request" : "Approved by me")}
-                {props.buttonFlag === 0 &&
-                  props.request.isComplete &&
-                  (voteFlag === 0 ? "You did not approve" : "Approved by me")}
-                {props.buttonFlag === 1 && "Finalize Request"}
-              </button>
+              <div className="text-center">
+                {props.role === "Manager" && (
+                  <button
+                    className="btn btn-primary text-center"
+                    disabled={
+                      isLoading || props.request.isComplete === "complete"
+                    }
+                    onClick={finalizeClick}
+                  >
+                    <span
+                      class="spinner-grow spinner-grow-sm"
+                      role="status"
+                      style={isLoading ? {} : { display: "none" }}
+                      aria-hidden="true"
+                    ></span>
+                    {!props.request.isComplete &&
+                      (isLoading ? (
+                        <span>Finalizing Request...</span>
+                      ) : (
+                        <span>Finalize Request</span>
+                      ))}
+
+                    {props.request.isComplete && <span>Request Finalized</span>}
+                  </button>
+                )}
+                {props.role === "Contributor" && (
+                  <button
+                    className="btn btn-primary text-center"
+                    disabled={isLoading || props.request.isComplete}
+                    onClick={approveVoteClick}
+                  >
+                    <span
+                      class="spinner-grow spinner-grow-sm"
+                      role="status"
+                      style={isLoading ? {} : { display: "none" }}
+                      aria-hidden="true"
+                    ></span>
+                    {!props.request.isComplete &&
+                      (isLoading ? (
+                        <span>Approving Request...</span>
+                      ) : (
+                        <span>Approve Request</span>
+                      ))}
+
+                    {props.request.isComplete && <span>Request Finalized</span>}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
