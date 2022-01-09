@@ -64,7 +64,7 @@ const CampaignDetail = () => {
           }
         });
     }
-  }, []);
+  }, [campaign]);
 
   useEffect(() => {
     axios

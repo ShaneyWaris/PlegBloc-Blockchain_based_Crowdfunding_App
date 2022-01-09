@@ -167,6 +167,26 @@ const finalizeRequest = async (ind, campaignAddress) => {
 
   let campaign;
   let accounts;
+
+  const finalize_request = async () => {
+    accounts = await web3.eth.getAccounts();
+    campaign = await new web3.eth.Contract(
+      compiledCampaign.abi,
+      campaignAddress
+    );
+
+    await campaign.methods.make_transaction(ind).send({
+      from: accounts[0],
+      gas: "2000000",
+    });
+  };
+
+  try {
+    await finalize_request();
+    return 1;
+  } catch {
+    return 0;
+  }
 };
 
 export {

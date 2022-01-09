@@ -44,7 +44,7 @@ function RequestsPage() {
           navigate("/allcontracts");
         });
     }
-  }, []);
+  }, [requests]);
 
   return (
     <>
