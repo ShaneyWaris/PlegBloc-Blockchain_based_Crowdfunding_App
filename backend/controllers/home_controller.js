@@ -733,6 +733,33 @@ module.exports.approveRequest = async (req, res) => {
 }
 
 
+// unapprove a request (cast a vote) by a user
+module.exports.unApproveRequest = async (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _id = req.body.id;
+  const _email = req.body.email;
+
+  Request.findOne({_id: _id}, async (err, request) => {
+    if (err) return sendErrorMessage(res, 200, "Error while fetching request from DB");
+
+    if (request) {
+      const index = request.backers.indexOf(_email);
+      if (index > -1) {
+        await request.backers.splice(index, 1);
+        await request.save();
+        return res.status(200).send({
+          isError: false
+        });
+      }
+      return sendErrorMessage(res, 200, "This user is already not present in the backers list.");
+    } else {
+      return sendErrorMessage(res, 200, "Request with this id do not exist.");
+    }
+  });
+}
+
+
 
 
 // ------------------ FUNCTIONS -------------------------
