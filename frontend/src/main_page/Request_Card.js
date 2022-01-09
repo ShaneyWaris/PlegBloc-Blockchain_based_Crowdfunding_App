@@ -138,7 +138,7 @@ function Request_Card(props) {
         style={{ maxWidth: 540 + "px", margin: 0 + "px", padding: 0 + "px" }}
         disabled={props.request.isComplete || isLoading}
       >
-        {props.complete === "complete" && (
+        {props.request.isComplete && (
           <div className="card-header alert-danger">
             Request #{props.request.index} {" (Complete)"}
           </div>
@@ -193,9 +193,7 @@ function Request_Card(props) {
                 {props.role === "Manager" && (
                   <button
                     className="btn btn-primary text-center"
-                    disabled={
-                      isLoading || props.request.isComplete === "complete"
-                    }
+                    disabled={isLoading || props.request.isComplete}
                     onClick={finalizeClick}
                   >
                     <span
