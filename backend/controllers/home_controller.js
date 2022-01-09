@@ -760,6 +760,54 @@ module.exports.unApproveRequest = async (req, res) => {
 }
 
 
+// finalize a request
+module.exports.finalizeRequest = async (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _id = req.body.id;
+
+  Request.findOne({_id: _id}, async (err, request) => {
+    if (err) return sendErrorMessage(res, 200, "Error while fetching request from DB");
+
+    if (request) {
+      request.isComplete = true;
+      await request.save();
+      return res.status(200).send({
+        isError: false
+      });
+    } else {
+      return sendErrorMessage(res, 200, "Request with this id do not exist.");
+    }
+  });
+}
+
+
+// un-finalize a request
+module.exports.unFinalizeRequest = async (req, res) => {
+  if (isLoggedIn(req) == false) return sendErrorMessage(res, 200, "You need to sign in first.");
+
+  const _id = req.body.id;
+
+  Request.findOne({_id: _id}, async (err, request) => {
+    if (err) return sendErrorMessage(res, 200, "Error while fetching request from DB");
+
+    if (request) {
+      request.isComplete = false;
+      await request.save();
+      return res.status(200).send({
+        isError: false
+      });
+    } else {
+      return sendErrorMessage(res, 200, "Request with this id do not exist.");
+    }
+  });
+}
+
+
+
+
+
+
 
 
 // ------------------ FUNCTIONS -------------------------
