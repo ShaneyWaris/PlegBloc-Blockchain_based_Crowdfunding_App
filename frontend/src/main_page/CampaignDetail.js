@@ -67,6 +67,7 @@ const CampaignDetail = () => {
   }, [campaign]);
 
   useEffect(() => {
+    // const color = getComputedStyle(document.documentElement).getPropertyValue('--button-color-code');
     axios
       .get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD")
       .then((response) => {
@@ -148,11 +149,22 @@ const CampaignDetail = () => {
   };
 
   const colorCode = (type) => {
-    if (type === "Goverment Campaign") return "DodgerBlue";
-    if (type === "Venture Capital Raising Campaign") return "orange";
-    if (type === "Social Cause Campaign") return "SaddleBrown";
-    if (type === "Medical Campaign") return "green";
-    return "SlateGrey";
+    if (type === "Goverment Campaign") {
+      document.documentElement.style.setProperty('--button-color-code', "#1E90FF");
+      return "DodgerBlue";
+    } else if (type === "Venture Capital Raising Campaign") {
+      document.documentElement.style.setProperty('--button-color-code', "orange");
+      return "orange";
+    } else if (type === "Social Cause Campaign") {
+      document.documentElement.style.setProperty('--button-color-code', "#8B4513");
+      return "SaddleBrown";
+    } else if (type === "Medical Campaign") {
+      document.documentElement.style.setProperty('--button-color-code', "green");
+      return "green";
+    } else {
+      document.documentElement.style.setProperty('--button-color-code', "#708090");
+      return "SlateGrey";
+    }
   };
 
   return (
@@ -172,7 +184,7 @@ const CampaignDetail = () => {
             <h5 class="display-7 fw-normal">{campaign.type}</h5>
           )}
 
-          <p class="fs-5 text-muted mt-4" style={{ textAlign: "justify" }}>
+          <p class="fs-6 text-muted mt-4" style={{ textAlign: "justify" }}>
             {campaign.description}
           </p>
         </div>
@@ -291,12 +303,12 @@ const CampaignDetail = () => {
                     ${(data.amount * usd).toFixed(2)}
                   </span>
                   <button
-                    class="btn btn-outline-secondary"
+                    class="btn btn-outline-secondary button-class"
                     type="button"
                     id="button-addon2"
                     disabled={isContriLoading}
                     onClick={onMakeContributionClick}
-                    style={{ borderRadius: "5px" }}
+                    style={{ borderRadius: "5px", borderColor: colorCode(campaign.type) }}
                   >
                     <span
                       class="spinner-grow spinner-grow-sm"
@@ -321,12 +333,12 @@ const CampaignDetail = () => {
                     View all the Requests made by the Manager
                   </label>
                   <button
-                    class="btn btn-outline-secondary"
+                    class="btn btn-outline-secondary button-class"
                     type="button"
                     id="button-addon2"
                     onClick={onViewRequestClick}
                     disabled={campaign.totalRequests === 0 ? true : false}
-                    style={{ width: "100%", borderRadius: "5px" }}
+                    style={{ width: "100%", borderRadius: "5px", borderColor: colorCode(campaign.type)}}
                   >
                     View All Requests
                   </button>
@@ -341,11 +353,11 @@ const CampaignDetail = () => {
                     Create a New Request
                   </label>
                   <button
-                    class="btn btn-outline-secondary"
+                    class="btn btn-outline-secondary button-class"
                     type="button"
                     id="button-addon2"
                     onClick={onCreateRequestClick}
-                    style={{ width: "100%", borderRadius: "5px" }}
+                    style={{ width: "100%", borderRadius: "5px",  borderColor: colorCode(campaign.type)}}
                   >
                     Create Requests
                   </button>

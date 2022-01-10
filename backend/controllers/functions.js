@@ -95,7 +95,7 @@ async function sendOTPEmail(name, email, otp) {
         from: process.env.mailID,
         to: email,
         subject: "Verify your Email ID with PlegBloc",
-        html: `<p>Hi ${name}!<br><br>Thanks for choosinng PlegBloc.<br>Please verify your email ID by clicking on below link. You have only 2 minutes to verify your email ID. After 2 minutes, this link will be expired.<br><br><b>${process.env.frontendBaseURL}/verifyEmail/${email}/${otp}</b><br><br>Thanks<br>Team - PlegBloc`,
+        html: `<p>Hi ${name}!<br><br>Congratulations! You've signed up for the most trustful crowdfunding platform.<br><br>Please verify your email ID by clicking on below link. You have only 2 minutes to verify your email ID. After 2 minutes, this link will be expired.<br><br><b>${process.env.frontendBaseURL}/verifyEmail/${email}/${otp}</b><br><br>Thanks<br>Team PlegBloc`,
     };
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

@@ -202,12 +202,12 @@ footer p {
   transition: 0.7s;
 }
 
-/* .solution_cards_box .solution_card:hover {
+.solution_cards_box .solution_card:hover {
   background: #309df0;
   color: #fff;
-  transform: scale(1.1);
+  transform: scale(1.06);
   z-index: 9;
-} */
+}
 
 /* .solution_cards_box .solution_card:hover::before {
   background: rgb(85 108 214 / 10%);
@@ -343,4 +343,21 @@ footer p {
     width: 50%;
     margin: 0 auto;
   }
+}
+
+
+
+
+:root {
+  --button-color-code: grey;
+}
+
+.button-class:hover {
+  color: white;
+  background-color: var(--button-color-code);
+}
+
+.button-class {
+  color: var(--button-color-code);
+  background-color: white;
 }
